@@ -1,0 +1,21 @@
+{
+  "name": "tspractice",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "parcel ./game/index.html",
+    "build": "parcel build ./game/index.html --no-source-maps --out-dir dist"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "parcel-bundler": "^1.12.5",
+    "phaser": "^3.55.2"
+  },
+  "devDependencies": {
+    "typescript": "^4.7.4"
+  }
+}
