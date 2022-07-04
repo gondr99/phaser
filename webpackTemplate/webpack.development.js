@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
     entry: {
-        app: './src/main.js'
+        app: './src/main.ts'
     },
     output: {
         filename: 'main.js',
@@ -13,5 +13,19 @@ module.exports = {
     devServer:{
         static: path.resolve(__dirname, 'src'),
         port:9000
+    },
+
+    resolve: {
+        extensions: ['.ts', '.tsx', '.js']
+    },
+
+    module: {
+        rules: [ 
+            {
+                test: /\.tsx?$/,
+                use: 'ts-loader',
+                exclude: /node_moudles/
+            }
+        ]
     }
 }
