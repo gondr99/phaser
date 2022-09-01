@@ -20,7 +20,7 @@ const physicsObject: Phaser.Types.Core.PhysicsConfig = {
         gravity: {
             y: GameOptions.gameGravity
         },
-        debug:true
+        debug:true  //디버그 옵션 추가. 이거 키면 피직스 라인들이 보인다.
     }
     
 }
@@ -30,7 +30,8 @@ const config : Phaser.Types.Core.GameConfig = {
     backgroundColor: 0x444444,
     scale: scaleObject,
     scene: [PreloadAssets, PlayGameScene],
-    physics: physicsObject
+    physics: physicsObject,
+    pixelArt: true //픽셀 퍼펙트로 그리게 된다. 
 }
 
 new Phaser.Game(config);
