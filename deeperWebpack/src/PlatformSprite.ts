@@ -1,6 +1,7 @@
 import PlatformGroup from "./PlatformGroup";
 import { GameOptions } from "./gameData/GameOptions";
 import GameUtil from "./GameUtil";
+import { PlatformTypes } from "./gameData/PlatformTypes";
 
 export default class PlatformSprite extends  Phaser.GameObjects.RenderTexture 
 {
@@ -13,25 +14,20 @@ export default class PlatformSprite extends  Phaser.GameObjects.RenderTexture
     platformGroup: PlatformGroup
     
     //왼쪽 가운데 오른쪽 스프라이트
-    leftSprite:Phaser.GameObjects.Sprite;
-    middleSprite:Phaser.GameObjects.Sprite;
-    rightSprite:Phaser.GameObjects.Sprite;
+    leftSprite:Phaser.GameObjects.Sprite[];
+    middleSprite:Phaser.GameObjects.Sprite[];
+    rightSprite:Phaser.GameObjects.Sprite[];
 
     constructor(scene: Phaser.Scene, group: PlatformGroup, 
-        leftSprite:Phaser.GameObjects.Sprite, 
-        middleSprite: Phaser.GameObjects.Sprite, 
-        rightSprite: Phaser.GameObjects.Sprite)
+        leftSprite:Phaser.GameObjects.Sprite[], 
+        middleSprite: Phaser.GameObjects.Sprite[], 
+        rightSprite: Phaser.GameObjects.Sprite[])
     {
         super(scene, 0, 0, 1, 16); //x, y, width, height
 
         this.leftSprite = leftSprite;
-        //console.log(leftSprite.originX, leftSprite.originY);
-        this.leftSprite.setOrigin(0, 0);
         this.middleSprite = middleSprite;
-        this.middleSprite.setOrigin(0, 0);
         this.rightSprite = rightSprite;
-        this.rightSprite.setOrigin(1, 0);
-        //console.log(rightSprite.originX, rightSprite.originY);
 
         this.setOrigin(0.5); //중심으로 오리진 잡고
         scene.add.existing(this);
@@ -54,25 +50,27 @@ export default class PlatformSprite extends  Phaser.GameObjects.RenderTexture
 
         if(lowestYPos == 0)
         {
-            //맨 처음으로 만들어지는 플랫폼
+            //맨 처음으로 만들어지는 플랫폼(이건 타입을 기본 타입으로 해야함.)
             this.y = height * GameOptions.firstPlatformPosition;
             this.x = width * 0.5;
         }else { //다음으로 만들어지는 플랫폼들
             this.y = lowestYPos + GameUtil.Rand(GameOptions.platformVerticalDistanceRange);
             this.x = width * 0.5 + GameUtil.Rand(GameOptions.platformHorizontalDistanceRange)
 
-            this.platformType = 0; // Phaser.Math.Between(0, 2);
+            let keys = Object.keys(PlatformTypes);
+            this.platformType = Phaser.Math.Between(0, keys.length-1);
         }
 
         let newWidth: number =  GameUtil.Rand(GameOptions.platformLengthRange) 
                                             / GameOptions.pixelScale;
         this.setSize(newWidth, 16); //높이 16픽셀짜리라 알맞게 그려지게 된다.
         this.body.setSize(newWidth, 16);
-        this.middleSprite.displayWidth = newWidth;
+        
+        this.middleSprite[this.platformType].displayWidth = newWidth;
 
-        this.draw(this.middleSprite, 0, 0);
-        this.draw(this.leftSprite, 0, 0);
-        this.draw(this.rightSprite, newWidth, 0);
+        this.draw(this.middleSprite[this.platformType], 0, 0);
+        this.draw(this.leftSprite[this.platformType], 0, 0);
+        this.draw(this.rightSprite[this.platformType], newWidth, 0);
         // this.displayWidth = GameUtil.Rand(GameOptions.platformLengthRange);
         // this.setTint(GameOptions.platformColors[this.platformType]);
     }

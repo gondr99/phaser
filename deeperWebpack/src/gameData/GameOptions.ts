@@ -1,3 +1,4 @@
+import { PlatformTypes } from "./PlatformTypes"
 export const GameOptions = {
     gameSize:{
         width:750,
@@ -18,5 +19,16 @@ export const GameOptions = {
     disappearTime: 1000,
 
     enemyPatrolingSpeed: [40, 80],
-    enemyChance: 1, //적이 플랫폼위에 나타날 확률 100%
+    //enemyChance: 1, //적이 플랫폼위에 나타날 확률 100%,
+
+    sawSpeedRange:[10, 30],
+    // platformStuf:[
+    //     PlatformTypes.EMPTY_PLATFORM,
+    //     PlatformTypes.ENEMY,
+    //     PlatformTypes.SAW,
+    //     PlatformTypes.ENEMY,
+    //     PlatformTypes.ENEMY,
+    //     PlatformTypes.SAW,
+    //     PlatformTypes.SAW,
+    // ],
 }

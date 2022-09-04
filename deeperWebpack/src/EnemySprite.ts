@@ -52,7 +52,6 @@ export default class EnemySprite extends Phaser.Physics.Arcade.Sprite
     {
         group.remove(this); //피직스 그룹에서 빼주고 
         pool.push(this); // 풀에다가 넣어준다.
-        //this.setVisible(false); //안보이게 처리 뒤집히는 애니메이션 재생을 위해 이건 다음에
     }
 
     //풀에서 그룹으로 다시 넣어주는 함수

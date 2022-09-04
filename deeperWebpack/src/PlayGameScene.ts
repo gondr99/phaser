@@ -8,6 +8,10 @@ import PlatformGroup from "./PlatformGroup";
 import EnemyGroup from "./EnemyGroup";
 import EnemySprite from "./EnemySprite";
 
+import SawSprite from "./SawSprite";
+import SawGroup from "./SawGroup";
+import { Game } from "phaser";
+
 export class PlayGameScene extends Phaser.Scene
 {
     //물리엔진 그룹(플랫폼들을 담을 공간)
@@ -15,6 +19,10 @@ export class PlayGameScene extends Phaser.Scene
     //적들을 담을 그룹
     enemyGroup: EnemyGroup;
     enemyPool: EnemySprite[];
+
+    //톱날을 담을 그룹
+    sawGroup: SawGroup;
+    sawPool: SawSprite[];
 
     hero: PlayerSprite;
     firstMove: boolean;
@@ -26,9 +34,9 @@ export class PlayGameScene extends Phaser.Scene
     depth: number = 0; //현재 내려간 깊이
     
     backgroundImage: Phaser.GameObjects.TileSprite;
-    leftPlatform: Phaser.GameObjects.Sprite;
-    rightPlatform: Phaser.GameObjects.Sprite;
-    middlePlatform: Phaser.GameObjects.Sprite;
+    leftPlatform: Phaser.GameObjects.Sprite[] = [];
+    rightPlatform: Phaser.GameObjects.Sprite[] = [];
+    middlePlatform: Phaser.GameObjects.Sprite[] = [];
 
     //입력을 위한 처리
     arrowKeys: Phaser.Types.Input.Keyboard.CursorKeys; //화살표키
@@ -54,10 +62,13 @@ export class PlayGameScene extends Phaser.Scene
 
         this.debugText = this.add.text(16, 16, '', fontStyle);
         this.enemyPool = []; //비어있는 배열로 풀을 선언
+        this.sawPool = []; //비어있는 배열로 선언
         this.firstMove = false; //아직 움직이지 않은것으로 
 
         this.platformGroup = new PlatformGroup(this.physics.world, this);
         this.enemyGroup = new EnemyGroup(this.physics.world, this);
+        this.sawGroup = new SawGroup(this.physics.world, this);
+
         this.isStart = false;
         this.depth = 0;
 
@@ -98,15 +109,27 @@ export class PlayGameScene extends Phaser.Scene
     placeStuffOnPlatform(p: PlatformSprite): void 
     {
         //적 배치 확률을 따져봐서 확률에 해당하면 적을 배치함
-        if(Math.random() < GameOptions.enemyChance) {
-            if(this.enemyPool.length == 0){ //풀에 여유분 적군이 없다면 
-                new EnemySprite(this, p, this.enemyGroup);
-            }
-            else {
-                let e: EnemySprite = this.enemyPool.shift() as EnemySprite;
-                e.poolToGroup(p, this.enemyGroup);
-            }
+        switch(p.platformType){
+            case PlatformTypes.ENEMY:
+                if(this.enemyPool.length == 0){ //풀에 여유분 적군이 없다면 
+                    new EnemySprite(this, p, this.enemyGroup);
+                }
+                else {
+                    let e: EnemySprite = this.enemyPool.shift() as EnemySprite;
+                    e.poolToGroup(p, this.enemyGroup);
+                }
+                break;
+            case PlatformTypes.SAW:
+                if(this.sawPool.length == 0)
+                {
+                    new SawSprite(this, p, this.sawGroup);
+                }else{
+                    let s: SawSprite = this.sawPool.shift() as SawSprite;
+                    s.poolToGroup(p, this.sawGroup);
+                }
+                break;
         }
+       
     }
 
     resetPlatform(platform: PlatformSprite): void {
@@ -138,6 +161,7 @@ export class PlayGameScene extends Phaser.Scene
             this.isStart = true; //게임 시작
 
             this.platformGroup.setVelocityY(-GameOptions.platformSpeed); //플랫폼 스피드로 위로 올라간다.
+            this.sawGroup.setVelocityY(-GameOptions.platformSpeed);
         }
     }
 
@@ -199,6 +223,11 @@ export class PlayGameScene extends Phaser.Scene
 
         e.platform = p;
     }
+      
+    //플레이어와 톱니의 충돌감지
+    handleSawCollision(body1: GameObject, body2: GameObject): void {
+        this.setGameOver(); 
+    }
     
 
     update(time: number, delta: number): void {
@@ -218,6 +247,8 @@ export class PlayGameScene extends Phaser.Scene
         this.physics.world.collide(this.enemyGroup, this.platformGroup, this.handleEnemyPlatformCollision, undefined, this);
         //플레이어와 적간의 충돌
         this.physics.world.collide(this.hero, this.enemyGroup, this.handleEnemyCollision, undefined, this);
+        //플레이어와 톱니와의 충돌 체크
+        this.physics.world.collide(this.hero, this.sawGroup, this.handleSawCollision, undefined, this);
 
         let platforms: PlatformSprite[] = this.platformGroup.getChildren() as PlatformSprite[];
         for(let p of platforms)
@@ -246,11 +277,28 @@ export class PlayGameScene extends Phaser.Scene
             let eBounds: Phaser.Geom.Rectangle = e.getBounds();
             if(eBounds.bottom < 0 ) //화면 위로 사라졌다면 즉시 풀에 넣어주고 visible false
             {
+                e.setVelocity(0, 0); //정지시키고
+                e.body.setAllowGravity(false); //중력 적용 안받게 해주고
                 e.groupToPool(this.enemyGroup, this.enemyPool); //화면밖으로 나갔다면 다시 풀에 넣어서 재활용
                 e.setVisible(false);
             }
             
         }
+
+        //톱니들의 업데이트
+        let saws : SawSprite[] = this.sawGroup.getChildren() as SawSprite[];
+
+        for(let s of saws)
+        {
+            s.patrol(); //모든 톱니들을 업데이트 시켜주고
+            let sawBounds: Phaser.Geom.Rectangle = s.getBounds();
+
+            if(sawBounds.bottom < 0) { //하늘위로 올라감.
+                s.groupToPool(this.sawGroup, this.sawPool); //풀로 돌려보냄
+            }
+
+        }
+
         if(this.hero.y > height || this.hero.y < 0)
         {
             this.setGameOver();
@@ -281,17 +329,22 @@ export class PlayGameScene extends Phaser.Scene
     //플랫폼 스프라이트 초기화
     initializePlatformSprites() : void
     {
-        this.leftPlatform = this.add.sprite(0, 0, 'leftplatformedge');
-        this.leftPlatform.setOrigin(0, 0); //중심점을 좌측 상단으로
-        this.leftPlatform.setVisible(false);
+        let names = ["platform", "platformtimer", "platformjumper", "platform", "platform"];
+        for(let key in PlatformTypes){
+            let idx = PlatformTypes[key];
+            this.leftPlatform[idx] = this.add.sprite(0, 0, "left"+ names[idx]);
+            this.leftPlatform[idx].setOrigin(0, 0);
+            this.leftPlatform[idx].setVisible(false);
 
-        this.rightPlatform = this.add.sprite(0, 0, 'rightplatformedge');
-        this.rightPlatform.setOrigin(1, 0); //중심점을 오른쪽 상단으로
-        this.rightPlatform.setVisible(false);
-
-        this.middlePlatform = this.add.sprite(0, 0, 'platform');
-        this.middlePlatform.setOrigin(0, 0);
-        this.middlePlatform.setVisible(false);
+            this.rightPlatform[idx] = this.add.sprite(0, 0, "right"+ names[idx]);
+            this.rightPlatform[idx].setOrigin(1, 0);
+            this.rightPlatform[idx].setVisible(false);
+            
+            this.middlePlatform[idx] = this.add.sprite(0, 0,names[idx]);
+            this.middlePlatform[idx].setOrigin(0,0);
+            this.middlePlatform[idx].setVisible(false);
+        }
+        
     }
     //애니메이션 초기화
     initializeAnimations() : void 
@@ -333,6 +386,16 @@ export class PlayGameScene extends Phaser.Scene
                 end:2,
             }),
             frameRate:20
+        });
+        //톱니 애니메이션
+        this.anims.create({
+            key:"saw",
+            frames:this.anims.generateFrameNumbers("saw", {
+                start:0,
+                end:7
+            }),
+            frameRate:20,
+            repeat:-1
         });
     
     }

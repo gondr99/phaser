@@ -31,7 +31,7 @@ const config : Phaser.Types.Core.GameConfig = {
     scale: scaleObject,
     scene: [PreloadAssets, PlayGameScene],
     physics: physicsObject,
-    pixelArt: true //픽셀 퍼펙트로 그리게 된다. 
+    pixelArt: false //픽셀 퍼펙트로 그리게 된다. 
 }
 
 new Phaser.Game(config);
