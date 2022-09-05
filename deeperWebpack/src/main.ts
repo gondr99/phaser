@@ -20,7 +20,7 @@ const physicsObject: Phaser.Types.Core.PhysicsConfig = {
         gravity: {
             y: GameOptions.gameGravity
         },
-        debug:true  //디버그 옵션 추가. 이거 키면 피직스 라인들이 보인다.
+        debug:false  //디버그 옵션 추가. 이거 키면 피직스 라인들이 보인다.
     }
     
 }
