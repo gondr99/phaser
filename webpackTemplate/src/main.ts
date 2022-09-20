@@ -19,16 +19,17 @@ class PlayGameScene extends Phaser.Scene {
         this.image.rotation += 15 * delta * 0.0001;
     }
 }
+let scaleObject: Phaser.Types.Core.ScaleConfig = {
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    parent:'theGame',
+    width:320,
+    height:320,
+}
 
 let config = {
-    scale: {
-        mode: Phaser.Scale.FIT,
-        autoCenter: Phaser.Scale.CENTER_BOTH,
-        parent:'theGame',
-        width:800,
-        height:600,
-        
-    },
+    type: Phaser.AUTO,
+    scale: scaleObject,
     scene: PlayGameScene
 };
 

@@ -10,7 +10,6 @@ import EnemySprite from "./EnemySprite";
 
 import SawSprite from "./SawSprite";
 import SawGroup from "./SawGroup";
-import { Game } from "phaser";
 
 export class PlayGameScene extends Phaser.Scene
 {
