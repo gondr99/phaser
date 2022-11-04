@@ -30,7 +30,8 @@ export default class PlatformSprite extends Phaser.GameObjects.RenderTexture
         border.clear();
         border.lineStyle(8, 0x000, 1); //라인두께, 색상, 알파값
         border.strokeRect(0, 0, this.displayWidth, this.displayHeight); //렌더 텍스쳐의 크기만큼 사각형 그려주기
-        this.draw(pattern, this.displayWidth * 0.5, Phaser.Math.Between(0, GameOptions.platformHeight));
+        this.draw(pattern, this.displayWidth * 0.5, 
+            Phaser.Math.Between(0, GameOptions.platformHeight));
         this.draw(eyes, this.displayWidth / 2, this.displayHeight / 2);
         this.draw(border);
     }

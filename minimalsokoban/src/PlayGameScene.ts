@@ -41,6 +41,20 @@ export class PlayGameScene extends Phaser.Scene
         });
 
         this.arrowKeys = this.input.keyboard.createCursorKeys();
+
+        document.querySelector("#sendBtn")?.addEventListener("click", e => {
+            let xhr:XMLHttpRequest = new XMLHttpRequest();
+            
+            xhr.open("POST", "http://localhost:9090/data");
+            xhr.setRequestHeader("Content-type", "applicaion/json");
+            xhr.onreadystatechange = ()=>{
+                if(xhr.readyState == XMLHttpRequest.DONE)
+                {
+                    console.log(xhr.responseText);
+                }
+            };
+            xhr.send(JSON.stringify({name:"gondr"}));
+        });
     }
 
     update(): void

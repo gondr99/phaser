@@ -7,10 +7,10 @@ let scaleObject: Phaser.Types.Core.ScaleConfig = {
     autoCenter: Phaser.Scale.CENTER_BOTH,
     parent:'theGame',
     width:320,
-    height:320,
+    height:320, 
 }
-
-let config = {
+ 
+let config = { 
     type: Phaser.AUTO,
     scale: scaleObject,
     backgroundColor:0x262626,

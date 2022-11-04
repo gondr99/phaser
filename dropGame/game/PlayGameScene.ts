@@ -117,7 +117,8 @@ export class PlayGameScene extends Phaser.Scene
         if (this.hero.canDestroyPlatform && this.hero.isDying == false) {
             console.log("파괴");
             this.hero.canDestroyPlatform = false;
-            let closestPlatform: Phaser.Physics.Arcade.Body = this.physics.closest(this.hero) as Phaser.Physics.Arcade.Body;
+            let closestPlatform: Phaser.Physics.Arcade.Body = 
+                this.physics.closest(this.hero) as Phaser.Physics.Arcade.Body;
             let platform: PlatformSprite = closestPlatform.gameObject as PlatformSprite;
             platform.explodeAndDestroy(this.emitter);
             this.initPlatform(platform); //아래로 내려서 재활용
@@ -211,7 +212,8 @@ export class PlayGameScene extends Phaser.Scene
 
     update(): void {
         if (this.hero.isDying == false) {
-            this.physics.world.collide(this.hero, this.platformGroup, this.handleCollision, undefined, this);
+            this.physics.world.collide(this.hero, this.platformGroup, this.handleCollision,
+                 undefined, this);
         }
         let platforms: PlatformSprite[] = this.platformGroup.getChildren() as PlatformSprite[];
         for (let platform of platforms) {
@@ -219,9 +221,12 @@ export class PlayGameScene extends Phaser.Scene
                 this.scene.start('PlayGame');     //플레이어가 첫 플랫폼으로부터 화면 하나만큼 내려오면 게임오버
             }   
             //플랫폼과 게임 좌우 외곽라인중 짧은 라인과의 거리 체크 해서 
-            let distance: number = Math.max(0.2, 1 - ( (Math.abs(this.gameWidth / 2 - platform.x) / (this.gameWidth / 2)) )) * Math.PI / 2;
+            let distance: number = Math.max(
+                0.2, 
+                1 - ( (Math.abs(this.gameWidth / 2 - platform.x) / (this.gameWidth / 2)) )) * Math.PI / 2;
             platform.body.setVelocityX(platform.assignedVelocity * distance); //목적지에 다가가면 천천히
-            if ((platform.body.velocity.x < 0 && platform.getBounds().left < this.hero.displayWidth / 2) || (platform.body.velocity.x > 0 &&  platform.getBounds().right > this.gameWidth - this.hero.displayWidth / 2)) {
+            if ((platform.body.velocity.x < 0 && platform.getBounds().left < this.hero.displayWidth / 2) || 
+            (platform.body.velocity.x > 0 &&  platform.getBounds().right > this.gameWidth - this.hero.displayWidth / 2)) {
                 //경계선에 가면 토글
                 platform.assignedVelocity *= -1;
            }

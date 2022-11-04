@@ -66,11 +66,14 @@ export class PlayGame extends Phaser.Scene
     {
         this.leftSquare = new GameWall(this, 0, this.gameHeight, 'base', new Vector2(1, 1));
         this.add.existing(this.leftSquare);
-        this.rightSquare = new GameWall(this, this.gameWidth, this.gameHeight, 'base', new Vector2(0, 1));
+        this.rightSquare = new GameWall(this, this.gameWidth, this.gameHeight, 'base',
+         new Vector2(0, 1));
         this.add.existing(this.rightSquare);
-        this.leftWall = new GameWall(this, 0, this.gameHeight - this.leftSquare.height, 'top', new Vector2(1, 1));
+        this.leftWall = new GameWall(this, 0, this.gameHeight - this.leftSquare.height, 'top',
+         new Vector2(1, 1));
         this.add.existing(this.leftWall);
-        this.rightWall = new GameWall(this, this.gameWidth, this.gameHeight - this.leftSquare.height, 'top', new Vector2(0, 1));
+        this.rightWall = new GameWall(this, this.gameWidth,
+             this.gameHeight - this.leftSquare.height, 'top', new Vector2(0, 1));
         this.add.existing(this.rightWall);
     }
 
@@ -217,7 +220,8 @@ export class PlayGame extends Phaser.Scene
         targetSquare.alpha = 0.3;
         targetSquare.setOrigin(0.5, 1);
         this.infoGroup.add(targetSquare);
-        let targetText = this.add.bitmapText(this.gameWidth / 2, targetSquare.y - targetSquare.displayHeight - 20, 'onefont', GameTexts.landHere, 48);
+        let targetText = this.add.bitmapText(this.gameWidth / 2,
+         targetSquare.y - targetSquare.displayHeight - 20, 'onefont', GameTexts.landHere, 48);
         targetText.setOrigin(0.5, 1);
         this.infoGroup.add(targetText);
         let holdText = this.add.bitmapText(this.gameWidth / 2, 250, 'onefont', GameTexts.infoLines[0], 40);
