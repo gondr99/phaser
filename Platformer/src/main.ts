@@ -16,7 +16,7 @@ let physicsConfig : Phaser.Types.Core.PhysicsConfig = {
     default: "arcade",
     arcade: {
         debug:true,
-        gravity:{y:200}
+        gravity:{y:500}
     }
 }
 

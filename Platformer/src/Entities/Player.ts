@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import InitAnimation from './PlayerAnimation'
+import InitPlayerAnimation from './PlayerAnimation'
 
 export type ArcadeSpriteWithBody = Phaser.Physics.Arcade.Sprite & {body: Phaser.Physics.Arcade.Body};
 
@@ -32,10 +32,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
     {
         this.setOrigin(0.5, 1); //아래쪽 중앙에 잡아준다.
         this.cursorsKey = this.scene.input.keyboard.createCursorKeys();
-        this.setGravityY(500);
-        this.setCollideWorldBounds(); //월드 경계선과 충돌하도록 처리
+        this.setCollideWorldBounds(true); //월드 경계선과 충돌하도록 처리
 
-        InitAnimation(this.scene.anims); //애니메이션 초기화
+        InitPlayerAnimation(this.scene.anims); //애니메이션 초기화
 
         this.initEvents();
     }

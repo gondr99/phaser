@@ -21,6 +21,14 @@ export default class PreloadAssetScene extends Phaser.Scene
             frameHeight:38,
             spacing:32
         });
+
+        //버드맨 이미지 로드
+        this.load.spritesheet("birdman", "assets/enemy/enemy_sheet.png", {
+            frameWidth:32,
+            frameHeight:64, 
+            spacing:32
+        });
+        
     }
 
     create(): void 
