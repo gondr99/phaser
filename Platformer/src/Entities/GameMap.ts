@@ -15,6 +15,8 @@ export default class GameMap
     playerZones: Zone;
     endZone: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 
+    enemySpawns: Phaser.Types.Tilemaps.TiledObject[];
+
     constructor(scene: Phaser.Scene, key:string)
     {
         this.scene = scene;
@@ -31,6 +33,9 @@ export default class GameMap
         const tileSet: Phaser.Tilemaps.Tileset = this.map.getTileset("main_lev_build_1");
         this.platforms = this.map.createLayer("platforms", tileSet);
         this.environments = this.map.createLayer("Environments", tileSet);
+
+        //적생성위치
+        this.enemySpawns = this.map.getObjectLayer("Enemy_Spawns").objects;
 
         this.playerZones = this.map.getObjectLayer("Player_zones").objects.reduce( 
             (s:Zone, v:Phaser.Types.Tilemaps.TiledObject) : Zone => ({...s, [v.name]: v}), {} ); 

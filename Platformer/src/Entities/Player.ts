@@ -1,9 +1,10 @@
 import Phaser from 'phaser';
+import CollideableObject from './CollideableObject';
 import InitPlayerAnimation from './PlayerAnimation'
 
-export type ArcadeSpriteWithBody = Phaser.Physics.Arcade.Sprite & {body: Phaser.Physics.Arcade.Body};
+//export type ArcadeSpriteWithBody = Phaser.Physics.Arcade.Sprite & {body: Phaser.Physics.Arcade.Body};
 
-export default class Player extends Phaser.Physics.Arcade.Sprite
+export default class Player extends CollideableObject
 {
     speed:number;
     jumpPower:number;
@@ -13,8 +14,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
     maxJumpCount:number = 2;
     currentJumpCount:number = 0;
     isGround:boolean = false;
-
-   
 
     constructor(scene:Phaser.Scene, x:number, y:number, key:string, speed:number, jumpPower:number)
     {
@@ -35,6 +34,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
         this.setCollideWorldBounds(true); //월드 경계선과 충돌하도록 처리
 
         InitPlayerAnimation(this.scene.anims); //애니메이션 초기화
+
+        this.body.setSize(20, 36);
 
         this.initEvents();
     }
@@ -95,11 +96,5 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
         }else {
             this.play("jump", true);
         }
-    }
-
-    addCollider(other : Phaser.GameObjects.GameObject | Phaser.GameObjects.Group) : Player
-    {
-        this.scene.physics.add.collider(this, other);
-        return this;
     }
 }

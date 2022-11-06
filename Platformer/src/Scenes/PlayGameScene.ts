@@ -3,6 +3,8 @@ import GameMap from '../Entities/GameMap';
 import Player from '../Entities/Player';
 import { GameOption } from '../GameOption';
 import Birdman from '../Entities/Birdman';
+import { EnemyCategory } from '../EnemyClass';
+import Enemy from '../Entities/Enemy';
 
 
 export default class PlayGameScene extends Phaser.Scene {
@@ -25,8 +27,7 @@ export default class PlayGameScene extends Phaser.Scene {
         
         this.createFollowUpCam(); //플레이어를 따라다니는 카메라 셋
 
-
-        this.createEnemy();
+        this.createEnemy(this.map.enemySpawns);
     }
 
 
@@ -50,9 +51,18 @@ export default class PlayGameScene extends Phaser.Scene {
         this.cameras.main.startFollow(this.player);
     }
 
-    createEnemy(): void 
+    createEnemy(spawnPoints: Phaser.Types.Tilemaps.TiledObject[]): void 
     {
-        let enemy:Birdman = new Birdman(this, 200, 200);
-        enemy.addCollider(this.map.colliders);
+        for(let i = 0; i < spawnPoints.length; i++)
+        {
+            let className:string = spawnPoints[i].properties[0].value as string;
+            let e : Enemy = new EnemyCategory[className](this, spawnPoints[i].x as number, spawnPoints[i].y as number, "birdman", 20) as Enemy;
+            //let e = Reflect.construct(EnemyCategory[className] , [this, spawnPoints[i].x as number, spawnPoints[i].y as number, "birdman", 20]);
+            
+            // let enemy:Birdman = new Birdman(this, spawnPoints[i].x as number, spawnPoints[i].y as number, "birdman", 20);
+            e.addCollider(this.map.colliders)
+              .addCollider(this.player);
+        }
+        
     }
 }
