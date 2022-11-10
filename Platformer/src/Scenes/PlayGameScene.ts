@@ -3,16 +3,20 @@ import GameMap from '../Entities/GameMap';
 import Player from '../Entities/Player';
 import { GameOption } from '../GameOption';
 import Birdman from '../Entities/Birdman';
-import { EnemyCategory } from '../EnemyClass';
 import Enemy from '../Entities/Enemy';
+import Enemies from '../Groups/Enemies';
+import UIManager from '../Core/UIManager';
 
 
 export default class PlayGameScene extends Phaser.Scene {
-
-    map:GameMap;
     
     player : Player;
+    enemies: Enemies;
     
+    // graphics: Phaser.GameObjects.Graphics;
+    // line : Phaser.Geom.Line;
+    // isDraw: boolean;
+    // hits: Phaser.Tilemaps.Tile[] = [];
     constructor()
     {
         super({key:"PlayGameScene"});
@@ -20,23 +24,68 @@ export default class PlayGameScene extends Phaser.Scene {
 
     create() : void
     {
-        this.map = new GameMap( this, "cmap");
+        UIManager.Instance = new UIManager(this);
+        GameMap.Instance = new GameMap( this, "cmap");
 
         this.createPlayer(200, 350); //플레이어 이동속도 200으로 생성
-        this.player.addCollider(this.map.colliders); //맵의 충돌체와의 충돌처리
+        this.player.addCollider(GameMap.Instance.colliders); //맵의 충돌체와의 충돌처리
         
         this.createFollowUpCam(); //플레이어를 따라다니는 카메라 셋
+        this.createEnemy(GameMap.Instance.enemySpawns);
+        // this.line = new Phaser.Geom.Line();
 
-        this.createEnemy(this.map.enemySpawns);
+        // this.graphics.lineStyle(1, 0x00ff00);
+
+        // this.isDraw = false;
+        // this.input.on("pointerdown", this.startDrawing, this);
+        // this.input.on("pointerup", this.stopDrawing, this);
+    
     }
 
+    // startDrawing(e: Phaser.Input.Pointer): void 
+    // {
+    //     this.hits.filter(x => x.index != -1).forEach(x => x.setCollision(false));
+    //     let {worldX, worldY} = e;
+    //     this.line.x1 = worldX;
+    //     this.line.y1 = worldY;
+    //     this.isDraw = true;
+    // }
+
+    // stopDrawing(e: Phaser.Input.Pointer): void 
+    // {
+    //     let {worldX, worldY} = e;
+    //     this.line.x2 = worldX;
+    //     this.line.y2 = worldY;
+
+    //     this.graphics.clear();
+    //     this.hits = GameMap.Instance.platforms.getTilesWithinShape(this.line); //이거랑 라인이 충돌하는지 검사해보자.
+
+    //     this.hits.filter(x => x.index != -1).forEach(x => x.setCollision(true));
+        
+    //     this.graphics.strokeLineShape(this.line);
+    //     this.isDraw = false;
+
+    //     const collidingTileColor = new Phaser.Display.Color(243, 134, 48, 200);
+    //     GameMap.Instance.platforms.renderDebug(this.graphics, {tileColor:null, collidingTileColor });
+    // }
+
+    // update(time: number, delta: number): void {
+    //     if(this.isDraw)
+    //     {
+    //         let {worldX, worldY} = this.input.activePointer;
+    //         this.line.x2 = worldX;
+    //         this.line.y2 = worldY;
+    //         this.graphics.clear();
+    //         this.graphics.strokeLineShape(this.line);
+    //     }
+    // }
 
     createPlayer(speed:number, jumpPower:number) : void 
     {
-        let {x, y} = this.map.playerZones["startZone"]
-        this.player = new Player(this, x as number, y as number, "player", speed, jumpPower);
+        let {x, y} = GameMap.Instance.playerZones["startZone"]
+        this.player = new Player(this, x as number, y as number, "player", speed, jumpPower, 10);
 
-        const EndOfLevelOverlap: Phaser.Physics.Arcade.Collider = this.physics.add.overlap(this.player, this.map.endZone, ()=> {
+        const EndOfLevelOverlap: Phaser.Physics.Arcade.Collider = this.physics.add.overlap(this.player, GameMap.Instance.endZone, ()=> {
             //닿았을 때 처리. 한번만 작동하고 멈추도록
             EndOfLevelOverlap.active = false;
             console.log("Player reach to endzone") ;
@@ -53,16 +102,24 @@ export default class PlayGameScene extends Phaser.Scene {
 
     createEnemy(spawnPoints: Phaser.Types.Tilemaps.TiledObject[]): void 
     {
+        this.enemies = new Enemies(this);
+        //spawnPoints.length
         for(let i = 0; i < spawnPoints.length; i++)
         {
-            let className:string = spawnPoints[i].properties[0].value as string;
-            let e : Enemy = new EnemyCategory[className](this, spawnPoints[i].x as number, spawnPoints[i].y as number, "birdman", 20) as Enemy;
-            //let e = Reflect.construct(EnemyCategory[className] , [this, spawnPoints[i].x as number, spawnPoints[i].y as number, "birdman", 20]);
-            
+            let className:string = spawnPoints[i].properties[0].value as string; //첫번째 프로퍼티로 클래스 이름이 들어가 있음.
+            let e : Enemy = new (this.enemies.getTypes(className))(this, spawnPoints[i].x as number, spawnPoints[i].y as number, className.toLocaleLowerCase, 70) as Enemy;            
             // let enemy:Birdman = new Birdman(this, spawnPoints[i].x as number, spawnPoints[i].y as number, "birdman", 20);
-            e.addCollider(this.map.colliders)
-              .addCollider(this.player);
+
+            this.enemies.add(e); //그룹에 더한다.
         }
-        
+        this.enemies.addCollider(GameMap.Instance.colliders, undefined)
+            .addCollider(this.player, this.onPlayerCollision);
+    }
+
+    onPlayerCollision(body1: Phaser.Types.Physics.Arcade.GameObjectWithBody, body2:Phaser.Types.Physics.Arcade.GameObjectWithBody):void 
+    {
+        let enemy : Enemy = body1 as Enemy;
+        let player : Player = body2 as Player;
+        player.takeHit(1, enemy);
     }
 }

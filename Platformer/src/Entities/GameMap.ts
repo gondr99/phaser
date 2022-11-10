@@ -1,4 +1,5 @@
 import Phaser, { Scenes } from 'phaser';
+import UIManager from '../Core/UIManager';
 
 export interface Zone 
 {
@@ -7,6 +8,8 @@ export interface Zone
 
 export default class GameMap 
 {
+    static Instance:GameMap;
+
     scene: Phaser.Scene
     map:Phaser.Tilemaps.Tilemap;
     environments :Phaser.Tilemaps.TilemapLayer;
@@ -25,7 +28,9 @@ export default class GameMap
 
         this.createLayer();
         this.createEndOfLevel();
+        
     }
+
 
     createLayer():void 
     {

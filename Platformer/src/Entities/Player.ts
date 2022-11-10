@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import CollideableObject from './CollideableObject';
-import InitPlayerAnimation from './PlayerAnimation'
+import InitPlayerAnimation from './Animations/PlayerAnimation'
+
 
 //export type ArcadeSpriteWithBody = Phaser.Physics.Arcade.Sprite & {body: Phaser.Physics.Arcade.Body};
 
@@ -15,7 +16,12 @@ export default class Player extends CollideableObject
     currentJumpCount:number = 0;
     isGround:boolean = false;
 
-    constructor(scene:Phaser.Scene, x:number, y:number, key:string, speed:number, jumpPower:number)
+    health:number;
+
+    hasBeenHit: boolean = false; //맞았는지를 체크하는 불리언변수
+    bouncePower:number = 250;
+
+    constructor(scene:Phaser.Scene, x:number, y:number, key:string, speed:number, jumpPower:number, health:number)
     {
         super(scene, x, y, key);
 
@@ -23,6 +29,7 @@ export default class Player extends CollideableObject
         scene.physics.add.existing(this);
         this.speed = speed;
         this.jumpPower = jumpPower;
+        this.health = health;
         this.dynamicBody = this.body as Phaser.Physics.Arcade.Body; //바디캐스팅을 통해 타입 재정의
         this.init();
     }
@@ -59,7 +66,45 @@ export default class Player extends CollideableObject
         }
     }
 
+    takeHit(damage:number, dealer: Phaser.Types.Physics.Arcade.GameObjectWithBody): void 
+    {
+        if(this.hasBeenHit) return;
+
+        this.hasBeenHit = true;
+        let dir = new Phaser.Math.Vector2(this.body.x - dealer.body.x, this.body.y - dealer.body.y);
+        dir = dir.normalize();
+        dir.y = -1;
+        this.bounceOff(dir);
+        let tween = this.playDamageTweenAnimation();
+        this.scene.time.delayedCall(1000, ()=> {
+            this.hasBeenHit = false;
+            tween.stop(0); //원래 상태로
+        });
+        // this.scene.time.addEvent({
+        //     delay:1000,
+        //     callback: () => {
+        //         this.hasBeenHit = false;
+        //     }
+        // })
+    }
+
+    bounceOff(dir: Phaser.Math.Vector2) {
+        this.setVelocity(dir.x * this.bouncePower, dir.y * this.bouncePower);
+    }
+
+    playDamageTweenAnimation(): Phaser.Tweens.Tween 
+    {
+        return this.scene.tweens.add({
+            targets:this,
+            duration:200,
+            repeat:-1,
+            alpha: 0.2,
+            yoyo:true
+        });
+    }
+
     update(time: number, delta: number): void {
+        if(this.hasBeenHit) {return;}
         const {left, right, space} = this.cursorsKey;
         const isSpaceJustDown :boolean = Phaser.Input.Keyboard.JustDown(space); //막 한번 눌린것만 체크
         this.isGround = this.dynamicBody.onFloor();

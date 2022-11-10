@@ -99,7 +99,7 @@
          "name":"platforms",
          "opacity":1,
          "type":"tilelayer",
-         "visible":true,
+         "visible":false,
          "width":100,
          "x":0,
          "y":0
@@ -150,7 +150,7 @@
          "name":"Environments",
          "opacity":1,
          "type":"tilelayer",
-         "visible":true,
+         "visible":false,
          "width":100,
          "x":0,
          "y":0
@@ -186,7 +186,7 @@
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":true,
+         "visible":false,
          "x":0,
          "y":0
         }, 
@@ -210,8 +210,8 @@
                  "rotation":0,
                  "visible":true,
                  "width":0,
-                 "x":922,
-                 "y":282
+                 "x":463,
+                 "y":180
                 }, 
                 {
                  "class":"",
@@ -246,12 +246,12 @@
                  "rotation":0,
                  "visible":true,
                  "width":0,
-                 "x":484.5,
-                 "y":182
+                 "x":884.5,
+                 "y":282
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":true,
+         "visible":false,
          "x":0,
          "y":0
         }],
