@@ -17,6 +17,7 @@ export default abstract class Enemy extends CollideableObject
     }
 
     abstract init():void ;
+    abstract getDamage():number;
 
     initEvents(): void
     {

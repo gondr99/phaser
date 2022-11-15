@@ -13,7 +13,7 @@ export default class UIManager
     constructor(scene: Phaser.Scene)
     {
         this.scene = scene;
-        this.healthBar = new HealthBar(scene, 20, 20, 10);
+        this.healthBar = new HealthBar(scene, 20, 20, 2);
     }
 
     setHP(hp:number): void 

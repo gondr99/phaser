@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import CollideableObject from './CollideableObject';
 import InitPlayerAnimation from './Animations/PlayerAnimation'
+import UIManager from '../Core/UIManager';
+import Projectile from './Weapons/Projectile';
 
 
 //export type ArcadeSpriteWithBody = Phaser.Physics.Arcade.Sprite & {body: Phaser.Physics.Arcade.Body};
@@ -17,6 +19,7 @@ export default class Player extends CollideableObject
     isGround:boolean = false;
 
     health:number;
+    maxHealth:number;
 
     hasBeenHit: boolean = false; //맞았는지를 체크하는 불리언변수
     bouncePower:number = 250;
@@ -29,7 +32,7 @@ export default class Player extends CollideableObject
         scene.physics.add.existing(this);
         this.speed = speed;
         this.jumpPower = jumpPower;
-        this.health = health;
+        this.maxHealth = this.health = health;
         this.dynamicBody = this.body as Phaser.Physics.Arcade.Body; //바디캐스팅을 통해 타입 재정의
         this.init();
     }
@@ -51,6 +54,14 @@ export default class Player extends CollideableObject
     {
         //스프라이트는 업데이트가 없으니까 업데이트시에 이것도 실행해달라고 요청해야 함.
         this.scene.events.on(Phaser.Scenes.Events.UPDATE, this.update, this);
+
+        this.scene.input.keyboard.on("keydown-Q", this.fireProjectile, this);
+    }
+
+    fireProjectile(): void 
+    {
+        const projectile = new Projectile(this.scene, this.x, this.y, 'iceball', 200);
+        projectile.fire();
     }
 
     move(direction:number) : void 
@@ -63,7 +74,7 @@ export default class Player extends CollideableObject
         this.currentJumpCount++;
         if(this.isGround || this.currentJumpCount <= this.maxJumpCount ){
             this.setVelocityY(-this.jumpPower);
-        }
+        } 
     }
 
     takeHit(damage:number, dealer: Phaser.Types.Physics.Arcade.GameObjectWithBody): void 
@@ -80,6 +91,12 @@ export default class Player extends CollideableObject
             this.hasBeenHit = false;
             tween.stop(0); //원래 상태로
         });
+
+        this.health -= damage;
+
+        UIManager.Instance.healthBar.setHealth(this.health / this.maxHealth);
+
+
         // this.scene.time.addEvent({
         //     delay:1000,
         //     callback: () => {

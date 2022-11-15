@@ -28,6 +28,9 @@ export default class PreloadAssetScene extends Phaser.Scene
             frameHeight:64, 
             spacing:32
         });
+
+        //투사체 이미지 로드
+        this.load.image("iceball", "assets/weapons/iceball_001.png");
         
     }
 

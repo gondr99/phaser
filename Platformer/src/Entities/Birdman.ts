@@ -13,6 +13,8 @@ export default class Birdman extends Enemy
     speed: number;
     prevX:number;
 
+    
+    damage:number = 1;
     maxPatrolDistance:number = 300;
     currentPatrolDistance:number = 0;
     constructor(scene:Phaser.Scene, x:number, y:number, key:string, speed:number)
@@ -46,6 +48,10 @@ export default class Birdman extends Enemy
         
     }
 
+    override getDamage(): number {
+        return this.damage;
+    }
+
     patrol(time:number)
     {
         if(!this.body || !this.body.onFloor()) { return; }
@@ -64,7 +70,7 @@ export default class Birdman extends Enemy
                 direction.x = 0.5;
             }
 
-            const {line, hasHit} = GameUtil.raycast(start, direction.normalize(), GameMap.Instance.colliders);
+            const {line, hasHit} = GameUtil.raycast(start, direction.normalize(), GameMap.Instance.colliders, 70);
             if(this.scene.physics.config.debug){
                 this.rayGraphics.clear();
                 this.rayGraphics.strokeLineShape(line);

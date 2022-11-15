@@ -42,7 +42,54 @@ export default class PlayGameScene extends Phaser.Scene {
     
     }
 
-    // startDrawing(e: Phaser.Input.Pointer): void 
+    createPlayer(speed:number, jumpPower:number) : void 
+    {
+        let {x, y} = GameMap.Instance.playerZones["startZone"]
+        this.player = new Player(this, x as number, y as number, "player", speed, jumpPower, 10);
+
+        const EndOfLevelOverlap: Phaser.Physics.Arcade.Collider = this.physics.add.overlap(this.player, GameMap.Instance.endZone, ()=> {
+            //닿았을 때 처리. 한번만 작동하고 멈추도록
+            EndOfLevelOverlap.active = false;
+            console.log("Player reach to endzone") ;
+        })
+    }
+
+    createFollowUpCam(): void{
+        const {width, height, mapOffset, cameraZoomFactor, bottomOffset} = GameOption;
+        this.physics.world.setBounds(0, 0, width + mapOffset, height + bottomOffset);
+        this.cameras.main.setBounds(0, 0, width + mapOffset, height); 
+        this.cameras.main.setZoom(cameraZoomFactor); //줌인
+        this.cameras.main.startFollow(this.player);
+    }
+
+    createEnemy(spawnPoints: Phaser.Types.Tilemaps.TiledObject[]): void 
+    {
+        this.enemies = new Enemies(this);
+        //spawnPoints.length
+        for(let i = 0; i < spawnPoints.length; i++)
+        {
+            let className:string = spawnPoints[i].properties[0].value as string; //첫번째 프로퍼티로 클래스 이름이 들어가 있음.
+            let e : Enemy = new (this.enemies.getTypes(className))(this, spawnPoints[i].x as number, spawnPoints[i].y as number, className.toLocaleLowerCase, 70) as Enemy;            
+            // let enemy:Birdman = new Birdman(this, spawnPoints[i].x as number, spawnPoints[i].y as number, "birdman", 20);
+
+            this.enemies.add(e); //그룹에 더한다.
+        }
+
+        //플레이어와 적이 충돌했을 때의 내용
+        this.enemies.addCollider(GameMap.Instance.colliders, undefined)
+            .addCollider(this.player, this.onPlayerCollision);
+    }
+
+    onPlayerCollision(body1: Phaser.Types.Physics.Arcade.GameObjectWithBody, body2:Phaser.Types.Physics.Arcade.GameObjectWithBody):void 
+    {
+        let enemy : Enemy = body1 as Enemy;
+        let player : Player = body2 as Player;
+        player.takeHit(enemy.getDamage(), enemy);
+    }
+}
+
+
+// startDrawing(e: Phaser.Input.Pointer): void 
     // {
     //     this.hits.filter(x => x.index != -1).forEach(x => x.setCollision(false));
     //     let {worldX, worldY} = e;
@@ -79,47 +126,3 @@ export default class PlayGameScene extends Phaser.Scene {
     //         this.graphics.strokeLineShape(this.line);
     //     }
     // }
-
-    createPlayer(speed:number, jumpPower:number) : void 
-    {
-        let {x, y} = GameMap.Instance.playerZones["startZone"]
-        this.player = new Player(this, x as number, y as number, "player", speed, jumpPower, 10);
-
-        const EndOfLevelOverlap: Phaser.Physics.Arcade.Collider = this.physics.add.overlap(this.player, GameMap.Instance.endZone, ()=> {
-            //닿았을 때 처리. 한번만 작동하고 멈추도록
-            EndOfLevelOverlap.active = false;
-            console.log("Player reach to endzone") ;
-        })
-    }
-
-    createFollowUpCam(): void{
-        const {width, height, mapOffset, cameraZoomFactor, bottomOffset} = GameOption;
-        this.physics.world.setBounds(0, 0, width + mapOffset, height + bottomOffset);
-        this.cameras.main.setBounds(0, 0, width + mapOffset, height); 
-        this.cameras.main.setZoom(cameraZoomFactor); //줌인
-        this.cameras.main.startFollow(this.player);
-    }
-
-    createEnemy(spawnPoints: Phaser.Types.Tilemaps.TiledObject[]): void 
-    {
-        this.enemies = new Enemies(this);
-        //spawnPoints.length
-        for(let i = 0; i < spawnPoints.length; i++)
-        {
-            let className:string = spawnPoints[i].properties[0].value as string; //첫번째 프로퍼티로 클래스 이름이 들어가 있음.
-            let e : Enemy = new (this.enemies.getTypes(className))(this, spawnPoints[i].x as number, spawnPoints[i].y as number, className.toLocaleLowerCase, 70) as Enemy;            
-            // let enemy:Birdman = new Birdman(this, spawnPoints[i].x as number, spawnPoints[i].y as number, "birdman", 20);
-
-            this.enemies.add(e); //그룹에 더한다.
-        }
-        this.enemies.addCollider(GameMap.Instance.colliders, undefined)
-            .addCollider(this.player, this.onPlayerCollision);
-    }
-
-    onPlayerCollision(body1: Phaser.Types.Physics.Arcade.GameObjectWithBody, body2:Phaser.Types.Physics.Arcade.GameObjectWithBody):void 
-    {
-        let enemy : Enemy = body1 as Enemy;
-        let player : Player = body2 as Player;
-        player.takeHit(1, enemy);
-    }
-}
