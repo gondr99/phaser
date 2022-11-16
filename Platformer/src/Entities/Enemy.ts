@@ -3,10 +3,10 @@ import CollideableObject from "./CollideableObject";
 export default abstract class Enemy extends CollideableObject
 {
     speed:number;
-
+    hp:number;
     constructor(scene:Phaser.Scene, x:number, y:number, key:string, speed:number)
     {
-        super(scene, x, y, "birdman");
+        super(scene, x, y, key);
 
         scene.add.existing(this);
         scene.physics.add.existing(this);
@@ -16,8 +16,21 @@ export default abstract class Enemy extends CollideableObject
         this.initEvents();
     }
 
+    setHP(value:number) : void 
+    {
+        this.hp = value;
+    }
+
     abstract init():void ;
     abstract getDamage():number;
+
+    takeHit(value:number){
+        this.hp -= value;
+        if(this.hp <= 0){
+            this.die();
+        }
+    }
+    abstract die(): void;
 
     initEvents(): void
     {

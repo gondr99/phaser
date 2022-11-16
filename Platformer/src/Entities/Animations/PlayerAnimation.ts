@@ -21,6 +21,13 @@ export default (animationManager : Phaser.Animations.AnimationManager) =>
         frames:animationManager.generateFrameNumbers("player", 
         {start:17, end:23}),
         frameRate:4,
-        repeat:1
+        repeat:0
     });
+
+    animationManager.create({
+        key:"throw",
+        frames:animationManager.generateFrameNumbers("player_throw",{start:0, end:6}),
+        frameRate:14,
+        repeat:0,
+    })
 }

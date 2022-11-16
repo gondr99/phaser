@@ -2,7 +2,8 @@ import Phaser from 'phaser';
 import CollideableObject from './CollideableObject';
 import InitPlayerAnimation from './Animations/PlayerAnimation'
 import UIManager from '../Core/UIManager';
-import Projectile from './Weapons/Projectile';
+import ProjectilePool from './Weapons/ProjectilePool';
+import { GetTimestamp, CheckAnimationPlay } from '../Core/GameUtil';
 
 
 //export type ArcadeSpriteWithBody = Phaser.Physics.Arcade.Sprite & {body: Phaser.Physics.Arcade.Body};
@@ -23,6 +24,10 @@ export default class Player extends CollideableObject
 
     hasBeenHit: boolean = false; //맞았는지를 체크하는 불리언변수
     bouncePower:number = 250;
+
+    lastProjectileTime: number = 0; 
+    coolDown:number = 1000;//1초
+    projectileDamage: number = 10;
 
     constructor(scene:Phaser.Scene, x:number, y:number, key:string, speed:number, jumpPower:number, health:number)
     {
@@ -54,14 +59,26 @@ export default class Player extends CollideableObject
     {
         //스프라이트는 업데이트가 없으니까 업데이트시에 이것도 실행해달라고 요청해야 함.
         this.scene.events.on(Phaser.Scenes.Events.UPDATE, this.update, this);
-
+        
         this.scene.input.keyboard.on("keydown-Q", this.fireProjectile, this);
     }
 
     fireProjectile(): void 
     {
-        const projectile = new Projectile(this.scene, this.x, this.y, 'iceball', 200);
-        projectile.fire();
+        let now:number = GetTimestamp();
+        if(this.coolDown + this.lastProjectileTime > now) return;
+        this.lastProjectileTime = GetTimestamp();
+
+        const p = ProjectilePool.Instance.getProjectile();
+        let dir:number = 1;
+        if (this.flipX)
+            dir = -1;
+
+        let center = this.getCenter();
+
+        p.fire(center, 500, 1, dir, this.projectileDamage);
+
+        this.play("throw", true);
     }
 
     move(direction:number) : void 
@@ -95,14 +112,6 @@ export default class Player extends CollideableObject
         this.health -= damage;
 
         UIManager.Instance.healthBar.setHealth(this.health / this.maxHealth);
-
-
-        // this.scene.time.addEvent({
-        //     delay:1000,
-        //     callback: () => {
-        //         this.hasBeenHit = false;
-        //     }
-        // })
     }
 
     bounceOff(dir: Phaser.Math.Vector2) {
@@ -119,8 +128,9 @@ export default class Player extends CollideableObject
             yoyo:true
         });
     }
-
+    
     update(time: number, delta: number): void {
+
         if(this.hasBeenHit) {return;}
         const {left, right, space} = this.cursorsKey;
         const isSpaceJustDown :boolean = Phaser.Input.Keyboard.JustDown(space); //막 한번 눌린것만 체크
@@ -135,8 +145,6 @@ export default class Player extends CollideableObject
             this.setFlipX(false);
         }else {
             this.move(0);
-            //이미 재생중이면 재생하지 마라 옵션을 true로 설정
-            this.play('idle', true);
         }
 
         if( isSpaceJustDown ) {
@@ -145,6 +153,10 @@ export default class Player extends CollideableObject
 
         if(this.isGround && this.body.velocity.y == 0){
             this.currentJumpCount = 0; //바닥에 닿아있다면 점프카운트를 0으로 만들어라.
+        }
+        //console.log(this.anims.currentAnim.key);
+        if(CheckAnimationPlay(this.anims, "throw")) {
+            return;
         }
 
         if(this.isGround == true)
@@ -159,4 +171,12 @@ export default class Player extends CollideableObject
             this.play("jump", true);
         }
     }
+
 }
+
+// this.scene.time.addEvent({
+//     delay:1000,
+//     callback: () => {
+//         this.hasBeenHit = false;
+//     }
+// })

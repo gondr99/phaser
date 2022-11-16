@@ -1,6 +1,15 @@
 import Phaser from "phaser";
 import GameMap from "../Entities/GameMap";
 
+export const CheckAnimationPlay = (am:Phaser.Animations.AnimationState, key:string) : boolean => {
+    return am.isPlaying && am.currentAnim.key === key;
+}
+
+export const GetTimestamp = () : number=>{
+    let d = new Date();
+    return d.getTime();
+};
+
 export interface RayCastHit 
 {
     line:Phaser.Geom.Line;

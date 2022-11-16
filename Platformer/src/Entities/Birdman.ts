@@ -19,7 +19,9 @@ export default class Birdman extends Enemy
     currentPatrolDistance:number = 0;
     constructor(scene:Phaser.Scene, x:number, y:number, key:string, speed:number)
     {
+        console.log(key);
         super(scene, x, y, key, speed);
+        
         this.prevX = x;
         this.speed = speed;
     }
@@ -50,6 +52,11 @@ export default class Birdman extends Enemy
 
     override getDamage(): number {
         return this.damage;
+    }
+
+    override die(): void 
+    {
+        console.log("DEad");
     }
 
     patrol(time:number)

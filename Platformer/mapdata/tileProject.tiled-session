@@ -8,12 +8,15 @@
         "."
     ],
     "fileStates": {
+        "": {
+            "scaleInEditor": 1
+        },
         "D:/dev/phaser/Platformer/src/assets/crystal_map.json": {
             "scale": 1,
-            "selectedLayer": 0,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 353.5,
-                "y": 225.5
+                "x": 740,
+                "y": 430.5
             }
         },
         "D:/dev/phaser/Platformer/src/assets/crystal_map.json#main_lev_build_1": {

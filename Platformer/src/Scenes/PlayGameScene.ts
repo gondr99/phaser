@@ -6,6 +6,12 @@ import Birdman from '../Entities/Birdman';
 import Enemy from '../Entities/Enemy';
 import Enemies from '../Groups/Enemies';
 import UIManager from '../Core/UIManager';
+import ProjectilePool from '../Entities/Weapons/ProjectilePool';
+import CollideableObject from '../Entities/CollideableObject';
+import Projectile from '../Entities/Weapons/Projectile';
+import ExtraAnimation from '../Entities/Animations/ExtraAnimation';
+import EffectManager from '../Entities/Effects/EffectManager';
+
 
 
 export default class PlayGameScene extends Phaser.Scene {
@@ -24,8 +30,10 @@ export default class PlayGameScene extends Phaser.Scene {
 
     create() : void
     {
-        UIManager.Instance = new UIManager(this);
         GameMap.Instance = new GameMap( this, "cmap");
+        UIManager.Instance = new UIManager(this);
+        ProjectilePool.Instance = new ProjectilePool(this);
+        EffectManager.Instance = new EffectManager(this);
 
         this.createPlayer(200, 350); //플레이어 이동속도 200으로 생성
         this.player.addCollider(GameMap.Instance.colliders); //맵의 충돌체와의 충돌처리
@@ -39,7 +47,8 @@ export default class PlayGameScene extends Phaser.Scene {
         // this.isDraw = false;
         // this.input.on("pointerdown", this.startDrawing, this);
         // this.input.on("pointerup", this.stopDrawing, this);
-    
+        
+        ExtraAnimation(this.anims); //기타 애니메이션 로딩
     }
 
     createPlayer(speed:number, jumpPower:number) : void 
@@ -69,15 +78,16 @@ export default class PlayGameScene extends Phaser.Scene {
         for(let i = 0; i < spawnPoints.length; i++)
         {
             let className:string = spawnPoints[i].properties[0].value as string; //첫번째 프로퍼티로 클래스 이름이 들어가 있음.
-            let e : Enemy = new (this.enemies.getTypes(className))(this, spawnPoints[i].x as number, spawnPoints[i].y as number, className.toLocaleLowerCase, 70) as Enemy;            
-            // let enemy:Birdman = new Birdman(this, spawnPoints[i].x as number, spawnPoints[i].y as number, "birdman", 20);
+            let e : Enemy = new (this.enemies.getTypes(className))(this, spawnPoints[i].x as number, spawnPoints[i].y as number, className.toLocaleLowerCase(), 70) as Enemy;            
+            e.setHP(40); //적의 체력을 어떻게?
 
             this.enemies.add(e); //그룹에 더한다.
         }
 
         //플레이어와 적이 충돌했을 때의 내용
         this.enemies.addCollider(GameMap.Instance.colliders, undefined)
-            .addCollider(this.player, this.onPlayerCollision);
+            .addCollider(this.player, this.onPlayerCollision)
+            .addCollider(ProjectilePool.Instance, this.onWeaponHit);
     }
 
     onPlayerCollision(body1: Phaser.Types.Physics.Arcade.GameObjectWithBody, body2:Phaser.Types.Physics.Arcade.GameObjectWithBody):void 
@@ -85,6 +95,15 @@ export default class PlayGameScene extends Phaser.Scene {
         let enemy : Enemy = body1 as Enemy;
         let player : Player = body2 as Player;
         player.takeHit(enemy.getDamage(), enemy);
+    }
+
+    onWeaponHit(body1: Phaser.Types.Physics.Arcade.GameObjectWithBody, body2:Phaser.Types.Physics.Arcade.GameObjectWithBody) 
+    {
+        let enemy: Enemy = body1 as Enemy;
+        let projectile: Projectile = body2 as Projectile;
+
+        enemy.takeHit(projectile.damage); //발사체의 데미지만큼 데미지 입히고
+        projectile.createExplosion(enemy); //
     }
 }
 
