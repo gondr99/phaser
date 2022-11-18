@@ -27,9 +27,22 @@ export default class PreloadAssetScene extends Phaser.Scene
             frameHeight:38,
             spacing:32
         });
+        //플레이어 칼질 애니메이션 로드
+        this.load.spritesheet("sword_default", "assets/weapons/sword_sheet_1.png", {
+            frameWidth:52, 
+            frameHeight:32,
+            spacing:16
+        });
 
         //버드맨 이미지 로드
         this.load.spritesheet("birdman", "assets/enemy/enemy_sheet.png", {
+            frameWidth:32,
+            frameHeight:64, 
+            spacing:32
+        });
+
+        //스네이크맨 이미지 로드
+        this.load.spritesheet("snakeman", "assets/enemy/enemy_sheet_2.png", {
             frameWidth:32,
             frameHeight:64, 
             spacing:32
@@ -43,6 +56,8 @@ export default class PreloadAssetScene extends Phaser.Scene
             frameWidth:32,
             frameHeight:32
         });
+
+        this.load.image("diamond", "assets/collectables/diamond.png");
         
     }
 

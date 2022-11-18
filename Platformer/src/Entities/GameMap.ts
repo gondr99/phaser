@@ -15,6 +15,7 @@ export default class GameMap
     environments :Phaser.Tilemaps.TilemapLayer;
     platforms :Phaser.Tilemaps.TilemapLayer;
     colliders :Phaser.Tilemaps.TilemapLayer;
+    collectable :Phaser.Tilemaps.ObjectLayer;
     playerZones: Zone;
     endZone: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 
@@ -45,6 +46,9 @@ export default class GameMap
         this.playerZones = this.map.getObjectLayer("Player_zones").objects.reduce( 
             (s:Zone, v:Phaser.Types.Tilemaps.TiledObject) : Zone => ({...s, [v.name]: v}), {} ); 
         //존을 설정한 오브젝트 레이어에서 오브젝트 배열을 뽑아 온다.
+
+        //아이템 레이어
+        this.collectable = this.map.getObjectLayer("Collectables");
 
         this.colliders = this.map.createLayer("Colliders", tileSet);
         this.colliders.setVisible(false);

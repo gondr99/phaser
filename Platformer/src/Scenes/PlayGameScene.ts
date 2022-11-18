@@ -11,6 +11,7 @@ import CollideableObject from '../Entities/CollideableObject';
 import Projectile from '../Entities/Weapons/Projectile';
 import ExtraAnimation from '../Entities/Animations/ExtraAnimation';
 import EffectManager from '../Entities/Effects/EffectManager';
+import MeleeWeapon from '../Entities/Weapons/MeleeWeapon';
 
 
 
@@ -19,10 +20,7 @@ export default class PlayGameScene extends Phaser.Scene {
     player : Player;
     enemies: Enemies;
     
-    // graphics: Phaser.GameObjects.Graphics;
-    // line : Phaser.Geom.Line;
-    // isDraw: boolean;
-    // hits: Phaser.Tilemaps.Tile[] = [];
+    collectables:Phaser.Physics.Arcade.StaticGroup;
     constructor()
     {
         super({key:"PlayGameScene"});
@@ -35,22 +33,28 @@ export default class PlayGameScene extends Phaser.Scene {
         ProjectilePool.Instance = new ProjectilePool(this);
         EffectManager.Instance = new EffectManager(this);
 
+        this.createCollectable(); //이게 먼저 생겨야 플레이어랑 이거랑 충돌 설정이 가능
         this.createPlayer(200, 350); //플레이어 이동속도 200으로 생성
         this.player.addCollider(GameMap.Instance.colliders); //맵의 충돌체와의 충돌처리
         
         this.createFollowUpCam(); //플레이어를 따라다니는 카메라 셋
         this.createEnemy(GameMap.Instance.enemySpawns);
-        // this.line = new Phaser.Geom.Line();
-
-        // this.graphics.lineStyle(1, 0x00ff00);
-
-        // this.isDraw = false;
-        // this.input.on("pointerdown", this.startDrawing, this);
-        // this.input.on("pointerup", this.stopDrawing, this);
         
-        ExtraAnimation(this.anims); //기타 애니메이션 로딩
+        
+        
+        ExtraAnimation(this.anims); //기타 애니메이션 로딩, 피격이펙트 스윙이펙트 등등
     }
 
+    //보석 레이어 생성
+    createCollectable() : void
+    {
+        this.collectables = this.physics.add.staticGroup(); //정적 그룹
+        
+        GameMap.Instance.collectable.objects.forEach(c => {
+            this.collectables.get(c.x, c.y, 'diamond').setDepth(5);
+        });
+        
+    }
     createPlayer(speed:number, jumpPower:number) : void 
     {
         let {x, y} = GameMap.Instance.playerZones["startZone"]
@@ -60,7 +64,19 @@ export default class PlayGameScene extends Phaser.Scene {
             //닿았을 때 처리. 한번만 작동하고 멈추도록
             EndOfLevelOverlap.active = false;
             console.log("Player reach to endzone") ;
-        })
+        });
+
+        this.physics.add.overlap(this.player, this.collectables, this.onCollect, undefined, this);
+    }
+
+    onCollect(body1: Phaser.Types.Physics.Arcade.GameObjectWithBody, body2:Phaser.Types.Physics.Arcade.GameObjectWithBody):void 
+    {
+        let player = body1 as Player;
+        
+        let jewel = body2 as Phaser.Physics.Arcade.Sprite;
+
+        jewel.disableBody(true, true);
+        console.log("보석");
     }
 
     createFollowUpCam(): void{
@@ -87,7 +103,8 @@ export default class PlayGameScene extends Phaser.Scene {
         //플레이어와 적이 충돌했을 때의 내용
         this.enemies.addCollider(GameMap.Instance.colliders, undefined)
             .addCollider(this.player, this.onPlayerCollision)
-            .addCollider(ProjectilePool.Instance, this.onWeaponHit);
+            .addCollider(ProjectilePool.Instance, this.onWeaponHit)
+            .addOverlap(this.player.meleeWeapon, this.onMeleeWeaponHit);
     }
 
     onPlayerCollision(body1: Phaser.Types.Physics.Arcade.GameObjectWithBody, body2:Phaser.Types.Physics.Arcade.GameObjectWithBody):void 
@@ -104,6 +121,16 @@ export default class PlayGameScene extends Phaser.Scene {
 
         enemy.takeHit(projectile.damage); //발사체의 데미지만큼 데미지 입히고
         projectile.createExplosion(enemy); //
+    }
+
+    onMeleeWeaponHit(body1: Phaser.Types.Physics.Arcade.GameObjectWithBody, body2:Phaser.Types.Physics.Arcade.GameObjectWithBody) 
+    {
+        let enemy: Enemy = body1 as Enemy;
+        let melee: MeleeWeapon = body2 as MeleeWeapon;
+        if(enemy.takeHit(melee.damage)) {
+            melee.createExplosion(enemy); //성공했다면 피격 마크 띄움
+        }; //칼의 데미지 만큼 입히고
+        
     }
 }
 
@@ -145,3 +172,11 @@ export default class PlayGameScene extends Phaser.Scene {
     //         this.graphics.strokeLineShape(this.line);
     //     }
     // }
+
+    // this.line = new Phaser.Geom.Line();
+
+        // this.graphics.lineStyle(1, 0x00ff00);
+
+        // this.isDraw = false;
+        // this.input.on("pointerdown", this.startDrawing, this);
+        // this.input.on("pointerup", this.stopDrawing, this);

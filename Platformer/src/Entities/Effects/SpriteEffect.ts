@@ -17,7 +17,8 @@ export default class SpriteEffect extends Phaser.GameObjects.Sprite
 
         //애니메이션 종료시 발생하는 이벤트
         this.on("animationcomplete", (animation:Phaser.Animations.Animation) => {
-            this.destroy();
+            this.setVisible(false);
+            this.setActive(false);
         }, this);
     }
 

@@ -1,9 +1,16 @@
+import { GetTimestamp } from "../Core/GameUtil";
 import CollideableObject from "./CollideableObject";
 
 export default abstract class Enemy extends CollideableObject
 {
     speed:number;
     hp:number;
+    isDead:boolean = false;
+
+    hitCooltime:number = 300;
+    lastHitTime:number = 0;
+
+
     constructor(scene:Phaser.Scene, x:number, y:number, key:string, speed:number)
     {
         super(scene, x, y, key);
@@ -24,11 +31,17 @@ export default abstract class Enemy extends CollideableObject
     abstract init():void ;
     abstract getDamage():number;
 
-    takeHit(value:number){
+    takeHit(value:number) : boolean{
+        if(this.hitCooltime + this.lastHitTime > GetTimestamp()) {
+            return false;
+        }
         this.hp -= value;
+        this.lastHitTime = GetTimestamp();
         if(this.hp <= 0){
+            this.isDead = true;
             this.die();
         }
+        return true;
     }
     abstract die(): void;
 
@@ -39,4 +52,6 @@ export default abstract class Enemy extends CollideableObject
     }
 
     abstract update(time: number, delta: number): void;
+
+
 }

@@ -1,11 +1,11 @@
 import Phaser, { Cameras, Scenes } from 'phaser';
 import Enemy from './Enemy';
-import { birdmanAnim as InitAnimation } from './Animations/EnemyAnimations';
+import { snakemanAnim as InitAnimation } from './Animations/EnemyAnimations';
 import GameMap from './GameMap';
 import GameUtil, { CheckAnimationPlay } from '../Core/GameUtil';
 import Vector2 = Phaser.Math.Vector2;
 
-export default class Birdman extends Enemy
+export default class SnakeMan extends Enemy
 {
     rayGraphics: Phaser.GameObjects.Graphics;
     movingDirection:number = 1;
@@ -36,8 +36,8 @@ export default class Birdman extends Enemy
         InitAnimation(this.scene.anims);
         
         
-        this.body.setSize(this.width-10, this.height-20);
-        this.body.setOffset(6, 20);
+        this.body.setSize(this.width-5, this.height-5);
+        this.body.setOffset(5, 5);
         this.setImmovable(true); //물리 현상에 의해 움직이지 않게    
     }
 
@@ -49,12 +49,12 @@ export default class Birdman extends Enemy
             return;
         }
 
-        if(CheckAnimationPlay(this.anims, "birdman-hurt")){
+        if(CheckAnimationPlay(this.anims, "snakeman-hurt")){
             this.setVelocityX(0);
             return;
         }
         
-        this.play('birdman-idle', true);
+        this.play('snakeman-idle', true);
         this.setVelocityX(this.speed * this.movingDirection);
 
         this.patrol(time);
@@ -118,7 +118,7 @@ export default class Birdman extends Enemy
         let result = super.takeHit(value);
         
         if(result) {
-            this.play('birdman-hurt', true);
+            this.play('snakeman-hurt', true);
         }
         return result;
     }

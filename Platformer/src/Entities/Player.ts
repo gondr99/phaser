@@ -4,6 +4,7 @@ import InitPlayerAnimation from './Animations/PlayerAnimation'
 import UIManager from '../Core/UIManager';
 import ProjectilePool from './Weapons/ProjectilePool';
 import { GetTimestamp, CheckAnimationPlay } from '../Core/GameUtil';
+import MeleeWeapon from './Weapons/MeleeWeapon';
 
 
 //export type ArcadeSpriteWithBody = Phaser.Physics.Arcade.Sprite & {body: Phaser.Physics.Arcade.Body};
@@ -13,7 +14,6 @@ export default class Player extends CollideableObject
     speed:number;
     jumpPower:number;
     cursorsKey : Phaser.Types.Input.Keyboard.CursorKeys;
-    dynamicBody : Phaser.Physics.Arcade.Body;
 
     maxJumpCount:number = 2;
     currentJumpCount:number = 0;
@@ -27,8 +27,13 @@ export default class Player extends CollideableObject
 
     lastProjectileTime: number = 0; 
     coolDown:number = 1000;//1초
-    projectileDamage: number = 10;
+    projectileDamage: number = 5;
 
+    meleeWeapon: MeleeWeapon;
+    meleeCoolDown:number = 400; //0.4초
+    lastMeleeTime:number = 0;
+    body:Phaser.Physics.Arcade.Body;
+    
     constructor(scene:Phaser.Scene, x:number, y:number, key:string, speed:number, jumpPower:number, health:number)
     {
         super(scene, x, y, key);
@@ -38,8 +43,9 @@ export default class Player extends CollideableObject
         this.speed = speed;
         this.jumpPower = jumpPower;
         this.maxHealth = this.health = health;
-        this.dynamicBody = this.body as Phaser.Physics.Arcade.Body; //바디캐스팅을 통해 타입 재정의
+        
         this.init();
+        this.setDepth(20); //플레이어의 소팅레이어을 20으로 설정한다.
     }
 
     init():void 
@@ -52,6 +58,8 @@ export default class Player extends CollideableObject
 
         this.body.setSize(20, 36);
 
+        this.meleeWeapon = new MeleeWeapon(this.scene, 0, 0, "sword_default", 10);
+
         this.initEvents();
     }
 
@@ -61,10 +69,24 @@ export default class Player extends CollideableObject
         this.scene.events.on(Phaser.Scenes.Events.UPDATE, this.update, this);
         
         this.scene.input.keyboard.on("keydown-Q", this.fireProjectile, this);
+        this.scene.input.keyboard.on("keydown-E", this.meleeAttack, this);
+    }
+
+    meleeAttack(): void
+    {
+        if(this.hasBeenHit) {return;}
+        
+        if(this.meleeCoolDown + this.lastMeleeTime > GetTimestamp()) return;
+        this.lastMeleeTime = GetTimestamp();
+
+        this.play("throw", true);
+        this.meleeWeapon.swing(this, this.flipX ? -1 : 1);
     }
 
     fireProjectile(): void 
     {
+        if(this.hasBeenHit) {return;}
+
         let now:number = GetTimestamp();
         if(this.coolDown + this.lastProjectileTime > now) return;
         this.lastProjectileTime = GetTimestamp();
@@ -134,7 +156,7 @@ export default class Player extends CollideableObject
         if(this.hasBeenHit) {return;}
         const {left, right, space} = this.cursorsKey;
         const isSpaceJustDown :boolean = Phaser.Input.Keyboard.JustDown(space); //막 한번 눌린것만 체크
-        this.isGround = this.dynamicBody.onFloor();
+        this.isGround = this.body.onFloor();
 
         if(left.isDown) {
             this.move(-1);
