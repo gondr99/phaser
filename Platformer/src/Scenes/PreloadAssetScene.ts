@@ -57,7 +57,15 @@ export default class PreloadAssetScene extends Phaser.Scene
             frameHeight:32
         });
 
+        //다이아몬드 이미지 로드
+
         this.load.image("diamond", "assets/collectables/diamond.png");
+        this.load.image("diamond-1", "assets/collectables/diamond_big_01.png");
+        this.load.image("diamond-2", "assets/collectables/diamond_big_02.png");
+        this.load.image("diamond-3", "assets/collectables/diamond_big_03.png");
+        this.load.image("diamond-4", "assets/collectables/diamond_big_04.png");
+        this.load.image("diamond-5", "assets/collectables/diamond_big_05.png");
+        this.load.image("diamond-6", "assets/collectables/diamond_big_06.png");
         
     }
 

@@ -8,9 +8,9 @@ export default class CollideableObject extends Phaser.Physics.Arcade.Sprite
         return this;
     }
  
-    addOverlap(other : Phaser.GameObjects.GameObject | Phaser.GameObjects.Group, Callback:ArcadePhysicsCallback) : CollideableObject
+    addOverlap(other : Phaser.GameObjects.GameObject | Phaser.GameObjects.Group, Callback:ArcadePhysicsCallback, context:any) : CollideableObject
     {
-        this.scene.physics.add.overlap(this, other, Callback, undefined, this);
+        this.scene.physics.add.overlap(this, other, Callback, undefined, context);
         return this;
     }
 }

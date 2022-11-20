@@ -12,6 +12,8 @@ import Projectile from '../Entities/Weapons/Projectile';
 import ExtraAnimation from '../Entities/Animations/ExtraAnimation';
 import EffectManager from '../Entities/Effects/EffectManager';
 import MeleeWeapon from '../Entities/Weapons/MeleeWeapon';
+import Collectable from '../Entities/Collectables/Collectable';
+import Collectables from '../Groups/Collectables';
 
 
 
@@ -20,7 +22,7 @@ export default class PlayGameScene extends Phaser.Scene {
     player : Player;
     enemies: Enemies;
     
-    collectables:Phaser.Physics.Arcade.StaticGroup;
+    collectables:Collectables;
     constructor()
     {
         super({key:"PlayGameScene"});
@@ -33,6 +35,8 @@ export default class PlayGameScene extends Phaser.Scene {
         ProjectilePool.Instance = new ProjectilePool(this);
         EffectManager.Instance = new EffectManager(this);
 
+        ExtraAnimation(this.anims); //기타 애니메이션 로딩, 피격이펙트 스윙이펙트 등등
+
         this.createCollectable(); //이게 먼저 생겨야 플레이어랑 이거랑 충돌 설정이 가능
         this.createPlayer(200, 350); //플레이어 이동속도 200으로 생성
         this.player.addCollider(GameMap.Instance.colliders); //맵의 충돌체와의 충돌처리
@@ -40,19 +44,21 @@ export default class PlayGameScene extends Phaser.Scene {
         this.createFollowUpCam(); //플레이어를 따라다니는 카메라 셋
         this.createEnemy(GameMap.Instance.enemySpawns);
         
-        
-        
-        ExtraAnimation(this.anims); //기타 애니메이션 로딩, 피격이펙트 스윙이펙트 등등
     }
 
     //보석 레이어 생성
     createCollectable() : void
     {
-        this.collectables = this.physics.add.staticGroup(); //정적 그룹
+        this.collectables = new Collectables(this).setDepth(5);; //정적 그룹
         
         GameMap.Instance.collectable.objects.forEach(c => {
-            this.collectables.get(c.x, c.y, 'diamond').setDepth(5);
+            //this.collectables.add(new Collectable(this, c.x as number, c.y as number, "diamond", 1));
+            let temp:Collectable = this.collectables.get(c.x, c.y, 'diamond') as Collectable;
+            temp.score = 1;
         });
+
+        //전체 그룹에 애니메이션 적용
+        this.collectables.playAnimation("diamond_shine");
         
     }
     createPlayer(speed:number, jumpPower:number) : void 
@@ -66,7 +72,8 @@ export default class PlayGameScene extends Phaser.Scene {
             console.log("Player reach to endzone") ;
         });
 
-        this.physics.add.overlap(this.player, this.collectables, this.onCollect, undefined, this);
+        this.player.addOverlap(this.collectables, this.onCollect, this);
+        //this.physics.add.overlap(this.player, this.collectables, this.onCollect, undefined, this);
     }
 
     onCollect(body1: Phaser.Types.Physics.Arcade.GameObjectWithBody, body2:Phaser.Types.Physics.Arcade.GameObjectWithBody):void 
