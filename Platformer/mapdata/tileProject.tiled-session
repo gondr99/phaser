@@ -12,12 +12,17 @@
             "scaleInEditor": 1
         },
         "D:/dev/phaser/Platformer/src/assets/crystal_map.json": {
-            "scale": 1,
-            "selectedLayer": 1,
+            "scale": 3,
+            "selectedLayer": 5,
             "viewCenter": {
-                "x": 740,
-                "y": 430.5
+                "x": 195.16666666666669,
+                "y": 218.33333333333331
             }
+        },
+        "D:/dev/phaser/Platformer/src/assets/crystal_map.json#diamond": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "D:/dev/phaser/Platformer/src/assets/crystal_map.json#main_lev_build_1": {
             "scaleInDock": 1,
@@ -38,7 +43,7 @@
             "scaleInDock": 1
         }
     },
-    "last.imagePath": "D:/dev/phaser/Platformer/src/assets",
+    "last.imagePath": "D:/dev/phaser/Platformer/src/assets/collectables",
     "map.height": 40,
     "map.lastUsedFormat": "json",
     "map.tileHeight": 16,
@@ -48,7 +53,7 @@
         "D:/dev/phaser/Platformer/src/assets/crystal_map.json"
     ],
     "project": "tileProject.tiled-project",
-    "property.type": "bool",
+    "property.type": "int",
     "recentFiles": [
         "D:/dev/phaser/Platformer/src/assets/crystal_map.json",
         "stage1.tmx"

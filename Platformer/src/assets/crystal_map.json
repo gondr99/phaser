@@ -302,6 +302,12 @@
                  "height":14,
                  "id":14,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"score",
+                         "type":"int",
+                         "value":1
+                        }],
                  "rotation":0,
                  "visible":true,
                  "width":16,
@@ -314,6 +320,12 @@
                  "height":14,
                  "id":15,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"score",
+                         "type":"int",
+                         "value":1
+                        }],
                  "rotation":0,
                  "visible":true,
                  "width":16,
@@ -326,6 +338,12 @@
                  "height":14,
                  "id":16,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"score",
+                         "type":"int",
+                         "value":1
+                        }],
                  "rotation":0,
                  "visible":true,
                  "width":16,
@@ -338,6 +356,12 @@
                  "height":14,
                  "id":17,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"score",
+                         "type":"int",
+                         "value":1
+                        }],
                  "rotation":0,
                  "visible":true,
                  "width":16,
@@ -350,6 +374,12 @@
                  "height":14,
                  "id":18,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"score",
+                         "type":"int",
+                         "value":1
+                        }],
                  "rotation":0,
                  "visible":true,
                  "width":16,
@@ -362,6 +392,12 @@
                  "height":14,
                  "id":19,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"score",
+                         "type":"int",
+                         "value":1
+                        }],
                  "rotation":0,
                  "visible":true,
                  "width":16,
@@ -374,6 +410,12 @@
                  "height":14,
                  "id":20,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"score",
+                         "type":"int",
+                         "value":1
+                        }],
                  "rotation":0,
                  "visible":true,
                  "width":16,
@@ -386,6 +428,12 @@
                  "height":14,
                  "id":21,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"score",
+                         "type":"int",
+                         "value":1
+                        }],
                  "rotation":0,
                  "visible":true,
                  "width":16,
@@ -398,6 +446,12 @@
                  "height":14,
                  "id":22,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"score",
+                         "type":"int",
+                         "value":1
+                        }],
                  "rotation":0,
                  "visible":true,
                  "width":16,
@@ -410,6 +464,12 @@
                  "height":14,
                  "id":23,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"score",
+                         "type":"int",
+                         "value":1
+                        }],
                  "rotation":0,
                  "visible":true,
                  "width":16,
@@ -422,6 +482,12 @@
                  "height":14,
                  "id":24,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"score",
+                         "type":"int",
+                         "value":1
+                        }],
                  "rotation":0,
                  "visible":true,
                  "width":16,
@@ -434,6 +500,12 @@
                  "height":14,
                  "id":25,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"score",
+                         "type":"int",
+                         "value":1
+                        }],
                  "rotation":0,
                  "visible":true,
                  "width":16,
@@ -446,6 +518,12 @@
                  "height":14,
                  "id":26,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"score",
+                         "type":"int",
+                         "value":1
+                        }],
                  "rotation":0,
                  "visible":true,
                  "width":16,
@@ -458,6 +536,12 @@
                  "height":14,
                  "id":27,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"score",
+                         "type":"int",
+                         "value":1
+                        }],
                  "rotation":0,
                  "visible":true,
                  "width":16,
@@ -470,6 +554,12 @@
                  "height":14,
                  "id":28,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"score",
+                         "type":"int",
+                         "value":1
+                        }],
                  "rotation":0,
                  "visible":true,
                  "width":16,
@@ -482,6 +572,12 @@
                  "height":14,
                  "id":29,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"score",
+                         "type":"int",
+                         "value":1
+                        }],
                  "rotation":0,
                  "visible":true,
                  "width":16,
@@ -494,6 +590,12 @@
                  "height":14,
                  "id":30,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"score",
+                         "type":"int",
+                         "value":1
+                        }],
                  "rotation":0,
                  "visible":true,
                  "width":16,
@@ -506,6 +608,12 @@
                  "height":14,
                  "id":32,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"score",
+                         "type":"int",
+                         "value":1
+                        }],
                  "rotation":0,
                  "visible":true,
                  "width":16,
@@ -605,7 +713,7 @@
          "tiles":[
                 {
                  "id":0,
-                 "image":"collectibles\/diamond.png",
+                 "image":"collectables\/diamond.png",
                  "imageheight":14,
                  "imagewidth":16
                 }],

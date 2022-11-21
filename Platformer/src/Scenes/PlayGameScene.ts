@@ -2,12 +2,10 @@ import Phaser from 'phaser';
 import GameMap from '../Entities/GameMap';
 import Player from '../Entities/Player';
 import { GameOption } from '../GameOption';
-import Birdman from '../Entities/Birdman';
 import Enemy from '../Entities/Enemy';
 import Enemies from '../Groups/Enemies';
 import UIManager from '../Core/UIManager';
 import ProjectilePool from '../Entities/Weapons/ProjectilePool';
-import CollideableObject from '../Entities/CollideableObject';
 import Projectile from '../Entities/Weapons/Projectile';
 import ExtraAnimation from '../Entities/Animations/ExtraAnimation';
 import EffectManager from '../Entities/Effects/EffectManager';
@@ -15,14 +13,15 @@ import MeleeWeapon from '../Entities/Weapons/MeleeWeapon';
 import Collectable from '../Entities/Collectables/Collectable';
 import Collectables from '../Groups/Collectables';
 
-
-
 export default class PlayGameScene extends Phaser.Scene {
     
     player : Player;
     enemies: Enemies;
     
     collectables:Collectables;
+    gameScore:number = 0;
+
+
     constructor()
     {
         super({key:"PlayGameScene"});
@@ -51,12 +50,7 @@ export default class PlayGameScene extends Phaser.Scene {
     {
         this.collectables = new Collectables(this).setDepth(5);; //정적 그룹
         
-        GameMap.Instance.collectable.objects.forEach(c => {
-            //this.collectables.add(new Collectable(this, c.x as number, c.y as number, "diamond", 1));
-            let temp:Collectable = this.collectables.get(c.x, c.y, 'diamond') as Collectable;
-            temp.score = 1;
-        });
-
+        this.collectables.addFromLayer(GameMap.Instance.collectable);
         //전체 그룹에 애니메이션 적용
         this.collectables.playAnimation("diamond_shine");
         
@@ -80,10 +74,12 @@ export default class PlayGameScene extends Phaser.Scene {
     {
         let player = body1 as Player;
         
-        let jewel = body2 as Phaser.Physics.Arcade.Sprite;
+        let jewel = body2 as Collectable;
 
         jewel.disableBody(true, true);
-        console.log("보석");
+        
+        this.gameScore += jewel.score; //점수 증가
+        console.log(this.gameScore);
     }
 
     createFollowUpCam(): void{

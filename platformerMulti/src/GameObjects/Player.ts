@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import InitPlayerAnimation from "../Animation/PlayerAnimation";
+import { SessionInfo } from "../Server/Network/ServerProtocol";
 
 export default class Player extends Phaser.Physics.Arcade.Sprite
 {
@@ -13,24 +14,33 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
     maxJumpCount:number = 2;
     currentJumpCount:number = 0;
 
+    //네트워크 관련 변수
+    isRemote:boolean = false;
+    id:string;
+    
     constructor(scene: Phaser.Scene, x:number, y:number, 
-        key:string, speed:number, jumpPower:number)
+        key:string, speed:number, jumpPower:number, isRemote:boolean, id:string)
     {
         super(scene, x, y, key);
         scene.add.existing(this);
         scene.physics.add.existing(this);
         this.speed = speed;
         this.jumpPower = jumpPower;
+        this.isRemote = isRemote; //원격 여부
+        this.id = id;
         this.init();
     }
 
     init(): void 
     {
         this.setCollideWorldBounds(true); //월드 경계선과 충돌
-        this.cursorsKey = this.scene.input.keyboard.createCursorKeys();
-
         InitPlayerAnimation(this.scene.anims); //플레이어 애니메이션을 만들어주고
-        this.scene.events.on(Phaser.Scenes.Events.UPDATE, this.update, this);
+        if(this.isRemote == false){
+            this.cursorsKey = this.scene.input.keyboard.createCursorKeys();
+            this.scene.events.on(Phaser.Scenes.Events.UPDATE, this.update, this);
+        }else {
+            this.body.setAllowGravity(false); //원격 제어할꺼면 중력 해제. 포지션까지 제어할꺼니까
+        }
     }
 
     //왼쪽 오른쪽 방향만 direction으로 받는다.
@@ -44,6 +54,24 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
         {
             this.setVelocityY(-this.jumpPower);
         }
+    }
+
+    setInfoSync(info: SessionInfo)
+    {
+        this.x = info.position.x;
+        this.y = info.position.y;
+        this.setFlipX(info.flipX);
+        //나중에 공격모션시에는 여기에 별도 if문 필요
+        if(info.isMoving) {
+            this.play("run", true);
+        }else{
+            this.play("idle", true);
+        }
+    }
+
+    isMoving(): boolean 
+    {
+        return this.body.velocity.length() > 0.1;
     }
 
     update(time: number, delta: number): void 

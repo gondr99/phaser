@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "webpack watch --config webpack.development.js --mode development",
+    "watch": "webpack --watch --config webpack.development.js --mode development",
     "server": "webpack serve --open --config webpack.development.js --mode development",
     "prod": "webpack --config webpack.distribution.js --mode production",
-    "nodeServer": "nodemon --watch \"src/Server/***.ts\" --exec \"ts-node\" \"src/Server/Server.ts\""
+    "nodeServer": "nodemon --watch \"src/Server/**/*.ts\" --exec \"ts-node\" \"src/Server/Server.ts\""
   },
   "keywords": [],
   "author": "",

@@ -1,12 +1,12 @@
 import Phaser, { Scenes } from "phaser"
-import { GameOption } from "../GameOption";
 import HealthBar from "../HUD/HealthBar";
-
+import Hud from "../HUD/Hud";
 
 export default class UIManager
 {
     static Instance:UIManager;
     healthBar: HealthBar;
+    hud: Hud;
 
     scene:Phaser.Scene;
 
@@ -14,6 +14,7 @@ export default class UIManager
     {
         this.scene = scene;
         this.healthBar = new HealthBar(scene, 20, 20, 2);
+        this.hud = new Hud(scene, 0, 0);
     }
 
     setHP(hp:number): void 
