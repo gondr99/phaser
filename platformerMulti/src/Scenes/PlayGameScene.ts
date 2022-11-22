@@ -3,8 +3,9 @@ import MapManager from "../Core/MapManager";
 import Player from "../GameObjects/Player";
 import {GameOption} from "../GameOption";
 import {io, Socket} from "socket.io-client"
-import { addClientProtocol } from "../Core/ClientProtocol";
-import { SessionInfo } from "../Server/Network/ServerProtocol";
+import { SessionInfo } from "../Network/Protocol";
+import SocketManager from "../Core/SocketManager";
+import ProjectilePool from "../GameObjects/Pools/ProjectilePool";
 
 interface Players 
 {
@@ -15,7 +16,6 @@ export default class PlayGameScene extends Phaser.Scene
 {
     player: Player;
 
-    socket:Socket; //접속 소켓
     syncTimer:number = 0; //플레이어 정보를 싱크할 타이머
     playerName:string;
 
@@ -24,22 +24,24 @@ export default class PlayGameScene extends Phaser.Scene
     constructor()
     {
         super({key:"PlayGame"});   
-        this.socket = io();        
+        const socket = io();
+        SocketManager.Instance = new SocketManager(socket); //소켓 매니저로 만들고
     }
 
     create():void 
     {
         MapManager.Instance = new MapManager(this, "level1");
-
-        addClientProtocol(this.socket, this); //클라이언트 소켓 이벤트 더하기
+        ProjectilePool.Instance = new ProjectilePool(this);
+        
+        SocketManager.Instance.addProtocol(this);
         
         this.playerName = "gondr";
-        this.socket.emit("enter", {id:this.socket.id, name:this.playerName});
+        SocketManager.Instance.sendData("enter", {id:SocketManager.Instance.socket.id, name:this.playerName});
     }
 
     onCompleteConnection(x:number, y:number): void 
     {
-        this.createPlayer(x, y, 200, 350, this.socket.id); //플레이어 생성, 스피드 200, 점프 350
+        this.createPlayer(x, y, 200, 350, SocketManager.Instance.socket.id); //플레이어 생성, 스피드 200, 점프 350
         this.cameraSetting(); //카메라 셋팅 호출
     }
 
@@ -61,13 +63,13 @@ export default class PlayGameScene extends Phaser.Scene
             this.syncTimer = 0;
             let playerInfo : SessionInfo = 
             {
-                id:this.socket.id, 
+                id:SocketManager.Instance.socket.id, 
                 name:this.playerName, 
                 flipX: this.player.flipX,
                 isMoving: this.player.isMoving(),
                 position:{x:this.player.x, y:this.player.y}
             };
-            this.socket.emit("info_sync", playerInfo);
+            SocketManager.Instance.sendData("info_sync", playerInfo);
                 
         }
     }

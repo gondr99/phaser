@@ -16,9 +16,4 @@ export default class UIManager
         this.healthBar = new HealthBar(scene, 20, 20, 2);
         this.hud = new Hud(scene, 0, 0);
     }
-
-    setHP(hp:number): void 
-    {
-
-    }
 }

@@ -5,7 +5,7 @@ import {Server, Socket} from 'socket.io';
 import SessionManager from './SessionManager';
 import Session from './Session';
 import MapManager from './ServerMapManager';
-import { addServerSocketListener } from './Network/ServerProtocol';
+import { addServerSocketListener } from '../Network/ServerListener';
 import JobTimer from './JobTimer';
 
 //익스프레스 웹 엔진을 만들어주고
@@ -41,7 +41,6 @@ io.on("connection", (socket: Socket) => {
     //여기서 리스너들을 종류별로 분할해줄 수는 있음.
     addServerSocketListener(socket, session); 
      
-    socket.on("disconnect", reason => console.log(reason));
 });
 
 server.listen(50000, ()=>{

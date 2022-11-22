@@ -4,8 +4,9 @@ import { GameOption } from "../GameOption";
 export default class Hud extends Phaser.GameObjects.Container
 {
     fontSize:number = 20;
-    scoreText:Phaser.GameObjects.Text;
-    scoreImage:Phaser.GameObjects.Image;
+    // scoreText:Phaser.GameObjects.Text;
+    // scoreImage:Phaser.GameObjects.Image;
+    scoreBoard: Phaser.GameObjects.Container;
     
     constructor(scene:Phaser.Scene, x:number, y:number)
     {
@@ -28,9 +29,9 @@ export default class Hud extends Phaser.GameObjects.Container
 
     setupList() : void 
     {
-        const scoreBoard = this.createScoreText();
+        this.scoreBoard = this.createScoreText();
 
-        this.add([scoreBoard]);
+        this.add([this.scoreBoard]);
 
         //컨테이너가 가지고 있는 리스트
         const lineHieght:number = 20;
@@ -41,11 +42,21 @@ export default class Hud extends Phaser.GameObjects.Container
 
     createScoreText(): Phaser.GameObjects.Container
     {
-        this.scoreText = this.scene.add.text(0, 0, '022', {fontSize:`${this.fontSize}px`, color:"#fff"});
-        this.scoreImage = this.scene.add.image(this.scoreText.width + 5, 0, 'diamond');
-        this.scoreImage.setOrigin(0).setScale(1.2); //좌측 상단
+        let scoreText = this.scene.add.text(0, 0, '0', {fontSize:`${this.fontSize}px`, color:"#fff"});
+        let scoreImage = this.scene.add.image(scoreText.width + 5, 0, 'diamond');
+        scoreImage.setOrigin(0).setScale(1.2); //좌측 상단
 
-        const ScoreBoard = this.scene.add.container(0, 0, [this.scoreText, this.scoreImage]);
-        return ScoreBoard;
+        const scoreBoard = this.scene.add.container(0, 0, [scoreText, scoreImage]);
+        return scoreBoard;
+    }
+
+    updateScoreText(score:number): void 
+    {
+        //, scoreImage ,Phaser.GameObjects.Image
+        const scoreText = this.scoreBoard.list[0] as Phaser.GameObjects.Text; //꺼내오고
+        scoreText.setText(score.toString());
+
+        const scoreImage = this.scoreBoard.list[1] as Phaser.GameObjects.Image;
+        scoreImage.setPosition(scoreText.width + 5, 0);
     }
 }

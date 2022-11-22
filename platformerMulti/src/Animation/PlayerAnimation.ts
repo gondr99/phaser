@@ -19,4 +19,11 @@ export default ( am: Phaser.Animations.AnimationManager) => {
         frameRate:4,
         repeat: 1
     });
+
+    am.create({
+        key:"throw",
+        frames:am.generateFrameNumbers("player_throw",{start:0, end:6}),
+        frameRate:14,
+        repeat:0,
+    });
 };

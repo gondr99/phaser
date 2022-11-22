@@ -1,4 +1,4 @@
-import { Position } from "./Network/ServerProtocol";
+import { Position } from "../Network/Protocol";
 import FS from 'fs'
 
 export default class ServerMapManager 

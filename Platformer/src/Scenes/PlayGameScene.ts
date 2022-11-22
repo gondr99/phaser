@@ -80,6 +80,8 @@ export default class PlayGameScene extends Phaser.Scene {
         
         this.gameScore += jewel.score; //점수 증가
         console.log(this.gameScore);
+
+        UIManager.Instance.hud.updateScoreText(this.gameScore);
     }
 
     createFollowUpCam(): void{

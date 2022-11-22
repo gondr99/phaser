@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import InitPlayerAnimation from "../Animation/PlayerAnimation";
-import { SessionInfo } from "../Server/Network/ServerProtocol";
+import { SessionInfo } from "../Network/Protocol";
+import PlayerAttack from "./PlayerAttack";
 
 export default class Player extends Phaser.Physics.Arcade.Sprite
 {
@@ -17,6 +18,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
     //네트워크 관련 변수
     isRemote:boolean = false;
     id:string;
+
+    iceballAttack: PlayerAttack;
     
     constructor(scene: Phaser.Scene, x:number, y:number, 
         key:string, speed:number, jumpPower:number, isRemote:boolean, id:string)
@@ -28,6 +31,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
         this.jumpPower = jumpPower;
         this.isRemote = isRemote; //원격 여부
         this.id = id;
+
+        //공격 객체 할당
+        this.iceballAttack = new PlayerAttack(this);
         this.init();
     }
 
@@ -37,10 +43,20 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
         InitPlayerAnimation(this.scene.anims); //플레이어 애니메이션을 만들어주고
         if(this.isRemote == false){
             this.cursorsKey = this.scene.input.keyboard.createCursorKeys();
+
+            //직접 조종하는 캐릭터는 q키 바인드
+            this.scene.input.keyboard.on("keydown-Q", this.fireIceball, this);
+
             this.scene.events.on(Phaser.Scenes.Events.UPDATE, this.update, this);
         }else {
             this.body.setAllowGravity(false); //원격 제어할꺼면 중력 해제. 포지션까지 제어할꺼니까
         }
+    }
+
+    //서버로 아이스볼을 발사할 것이라고 시그널 보내
+    fireIceball(): void
+    {
+        this.iceballAttack.attemptAttack(); //공격시도 
     }
 
     //왼쪽 오른쪽 방향만 direction으로 받는다.

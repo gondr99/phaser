@@ -12,11 +12,11 @@
             "scaleInEditor": 1
         },
         "D:/dev/phaser/Platformer/src/assets/crystal_map.json": {
-            "scale": 3,
+            "scale": 1,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 195.16666666666669,
-                "y": 218.33333333333331
+                "x": 609.5,
+                "y": 230
             }
         },
         "D:/dev/phaser/Platformer/src/assets/crystal_map.json#diamond": {

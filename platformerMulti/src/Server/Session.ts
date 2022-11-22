@@ -1,5 +1,5 @@
 import {Socket} from 'socket.io'
-import { Position, SessionInfo } from './Network/ServerProtocol';
+import { Position, SessionInfo } from '../Network/Protocol';
 
 export default class Session 
 {

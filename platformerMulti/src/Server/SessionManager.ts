@@ -1,4 +1,4 @@
-import { SessionInfo } from "./Network/ServerProtocol";
+import { SessionInfo } from "../Network/Protocol";
 import Session from "./Session";
 
 interface SessionMap 
