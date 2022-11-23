@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import InitPlayerAnimation from "../Animation/PlayerAnimation";
+import { CheckAnimationPlay } from "../Core/GameUtil";
 import { SessionInfo } from "../Network/Protocol";
 import PlayerAttack from "./PlayerAttack";
 
@@ -19,8 +20,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
     isRemote:boolean = false;
     id:string;
 
+    waitingConfirm:number[] = []; //피격당한 투사체에게 피격확정을 받기까지 대기중
+
     iceballAttack: PlayerAttack;
-    
+    hasBeenHit:boolean = false; //피격중에는 다시 안맞게
+    bouncePower:number = 250; //튕겨나가는 힘
+
     constructor(scene: Phaser.Scene, x:number, y:number, 
         key:string, speed:number, jumpPower:number, isRemote:boolean, id:string)
     {
@@ -35,6 +40,53 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
         //공격 객체 할당
         this.iceballAttack = new PlayerAttack(this);
         this.init();
+    }
+
+    isWaitingForHitConfirm(projectileId:number) : boolean
+    {
+        return this.waitingConfirm.find(x => x == projectileId) != undefined;
+    }
+
+    addWaiting(projectileId:number): void 
+    {
+        this.waitingConfirm.push(projectileId);
+    }
+
+    removeWaiting(projectileId:number): void 
+    {
+        let idx = this.waitingConfirm.findIndex(x => x == projectileId);
+        if(idx < 0) return;
+        this.waitingConfirm.splice(idx, 1); //하나 잘라내기
+    }
+
+    //피격당했을 때
+    takeHit(damage: number): void 
+    {
+        if(this.hasBeenHit) return;
+        this.hasBeenHit = true;
+
+        let tween = this.playDamageTweenAnimation();
+        this.scene.time.delayedCall(1000, ()=> {
+            this.hasBeenHit = false;
+            tween.stop(0); //원래 상태로
+        });
+
+        //여기에 데미지 처리 식 들어가야 한다.
+    }
+
+    bounceOff(dir: Phaser.Math.Vector2) {
+        this.setVelocity(dir.x * this.bouncePower, dir.y * this.bouncePower);
+    }
+
+    playDamageTweenAnimation(): Phaser.Tweens.Tween 
+    {
+        return this.scene.tweens.add({
+            targets:this,
+            duration:200,
+            repeat:-1,
+            alpha: 0.2,
+            yoyo:true
+        });
     }
 
     init(): void 
@@ -78,6 +130,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
         this.y = info.position.y;
         this.setFlipX(info.flipX);
         //나중에 공격모션시에는 여기에 별도 if문 필요
+
+        if(CheckAnimationPlay(this.anims, "throw")) {
+            return;
+        }
+        
         if(info.isMoving) {
             this.play("run", true);
         }else{
@@ -92,6 +149,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
 
     update(time: number, delta: number): void 
     {
+        if(this.hasBeenHit ) return;
         if(this.cursorsKey == undefined) return;
 
         const {left, right, space} = this.cursorsKey;
@@ -116,6 +174,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
         if(this.isGround && this.body.velocity.y == 0)
         {
             this.currentJumpCount = 0; //바닥에 닿으면 점프카운트 0으로 돌린다.
+        }
+
+        if(CheckAnimationPlay(this.anims, "throw")) {
+            return;
         }
 
         if(this.isGround == true)

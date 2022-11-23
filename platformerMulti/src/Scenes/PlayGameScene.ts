@@ -3,9 +3,10 @@ import MapManager from "../Core/MapManager";
 import Player from "../GameObjects/Player";
 import {GameOption} from "../GameOption";
 import {io, Socket} from "socket.io-client"
-import { SessionInfo } from "../Network/Protocol";
+import { ProjectileHitInfo, SessionInfo } from "../Network/Protocol";
 import SocketManager from "../Core/SocketManager";
 import ProjectilePool from "../GameObjects/Pools/ProjectilePool";
+import Projectile from "../GameObjects/Projectile";
 
 interface Players 
 {
@@ -53,7 +54,28 @@ export default class PlayGameScene extends Phaser.Scene
         }else {
             this.player = new Player(this, x, y, "player", speed, jumpPower, isRemote,id);
             this.physics.add.collider(this.player, MapManager.Instance.collisions);
+            this.physics.add.collider(this.player, ProjectilePool.Instance.pool, this.hitByProjectile, undefined, this);
+
         }
+    }
+
+    //내가 투사체에 맞을경우 보내주는 방법도 있고, 내 투사체가 남에게 맞았을 때 보내는 방식도 있다.
+    hitByProjectile(body1:any, body2:any):void
+    {        
+        let p  = body2 as Projectile; //투사체로 캐스팅
+        let player = body1 as Player; //플레이어 캐스팅
+
+        if(player.isWaitingForHitConfirm(p.projectileId)) return;
+
+        player.addWaiting(p.projectileId);
+
+        let {x, y} = p.getTopLeft();
+        let hitData: ProjectileHitInfo = {
+            playerId:SocketManager.Instance.socket.id, 
+            projectileId: p.projectileId,
+            projectileLTPosition: {x, y}
+        };
+        SocketManager.Instance.sendData("hit_report", hitData);
     }
 
     update(time: number, delta: number): void {

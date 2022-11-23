@@ -30,7 +30,7 @@ export default class PlayerAttack
         let center = this.player.getCenter();
         let position:Position = {x: center.x + direction * 5, y:center.y};
         let velocity:Position = {x: 400 * direction, y:0};
-        let data:Iceball = {ownerId,direction,position,lifetime:this.lifeTime,velocity};
+        let data:Iceball = {ownerId,direction,position,lifetime:this.lifeTime,velocity, projectileId:0};
 
         SocketManager.Instance.sendData("fire_projectile", data);
         return;
@@ -39,12 +39,12 @@ export default class PlayerAttack
     fireProjectile(data:Iceball) :void 
     {
         this.lastProjectileTime = GetTimestamp(); //현재시간 저장하고
-        let {position, direction, lifetime, ownerId, velocity} = data;
+        let {position, direction, lifetime, ownerId, velocity, projectileId} = data;
 
         let p = ProjectilePool.Instance.getProjectile();
-        p.initAndFire(position, lifetime, velocity.x , direction, ownerId);
+        p.initAndFire(position, lifetime, velocity.x , direction, ownerId, projectileId);
 
-        this.player.play("player_throw");
+        this.player.play("throw");
     }
 
 }

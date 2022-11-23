@@ -12,6 +12,7 @@ import EffectManager from '../Entities/Effects/EffectManager';
 import MeleeWeapon from '../Entities/Weapons/MeleeWeapon';
 import Collectable from '../Entities/Collectables/Collectable';
 import Collectables from '../Groups/Collectables';
+import CollideableObject from '../Entities/CollideableObject';
 
 export default class PlayGameScene extends Phaser.Scene {
     
@@ -38,11 +39,14 @@ export default class PlayGameScene extends Phaser.Scene {
 
         this.createCollectable(); //이게 먼저 생겨야 플레이어랑 이거랑 충돌 설정이 가능
         this.createPlayer(200, 350); //플레이어 이동속도 200으로 생성
-        this.player.addCollider(GameMap.Instance.colliders); //맵의 충돌체와의 충돌처리
         
         this.createFollowUpCam(); //플레이어를 따라다니는 카메라 셋
         this.createEnemy(GameMap.Instance.enemySpawns);
         
+        this.player.addCollider(GameMap.Instance.colliders, undefined, undefined); //맵의 충돌체와의 충돌처리        
+        this.player.addOverlap(this.collectables, this.onCollect, this);
+        this.player.addCollider(GameMap.Instance.traps, this.onPlayerHitByTrap, this)
+            .addCollider(this.enemies, this.onPlayerHit, this);
     }
 
     //보석 레이어 생성
@@ -66,9 +70,9 @@ export default class PlayGameScene extends Phaser.Scene {
             console.log("Player reach to endzone") ;
         });
 
-        this.player.addOverlap(this.collectables, this.onCollect, this);
-        //this.physics.add.overlap(this.player, this.collectables, this.onCollect, undefined, this);
+       
     }
+
 
     onCollect(body1: Phaser.Types.Physics.Arcade.GameObjectWithBody, body2:Phaser.Types.Physics.Arcade.GameObjectWithBody):void 
     {
@@ -107,16 +111,27 @@ export default class PlayGameScene extends Phaser.Scene {
 
         //플레이어와 적이 충돌했을 때의 내용
         this.enemies.addCollider(GameMap.Instance.colliders, undefined)
-            .addCollider(this.player, this.onPlayerCollision)
             .addCollider(ProjectilePool.Instance, this.onWeaponHit)
             .addOverlap(this.player.meleeWeapon, this.onMeleeWeaponHit);
     }
 
-    onPlayerCollision(body1: Phaser.Types.Physics.Arcade.GameObjectWithBody, body2:Phaser.Types.Physics.Arcade.GameObjectWithBody):void 
+    onPlayerHitByTrap(body1:any, body2: any) : void
     {
-        let enemy : Enemy = body1 as Enemy;
-        let player : Player = body2 as Player;
-        player.takeHit(enemy.getDamage(), enemy);
+        let player = body1 as Player;
+        let tile = body2 as Phaser.Tilemaps.Tile;
+
+        
+        let direction = new Phaser.Math.Vector2(player.body.x - tile.pixelX > 0 ? 1 : -1, 0);
+        player.takeHit(1, direction);
+    }
+
+    onPlayerHit(body1: Phaser.Types.Physics.Arcade.GameObjectWithBody, body2:Phaser.Types.Physics.Arcade.GameObjectWithBody):void 
+    {
+        let player : Player = body1 as Player;
+        let other = body2 as Enemy;
+
+        let direction = new Phaser.Math.Vector2(player.body.x - other.body.x, player.body.y - other.body.y);
+        player.takeHit(other.getDamage(), direction);
     }
 
     onWeaponHit(body1: Phaser.Types.Physics.Arcade.GameObjectWithBody, body2:Phaser.Types.Physics.Arcade.GameObjectWithBody) 

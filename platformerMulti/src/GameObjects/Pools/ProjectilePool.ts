@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { Position } from "../../Network/Protocol";
 import Projectile from "../Projectile";
 
 export default class ProjectilePool extends Phaser.Physics.Arcade.Group
@@ -27,5 +28,20 @@ export default class ProjectilePool extends Phaser.Physics.Arcade.Group
         projectile.setActive(true);
         projectile.setVisible(true);
         return projectile;
+    }
+
+    searchAndDestroy(id:number, pLTPos:Position): void 
+    {
+        let p = this.pool.find(x => x.projectileId == id);
+        if(p == undefined)
+        {
+            console.log(`error: no projectie ${id}`);
+            return;
+        }
+
+
+        p.addExplosion(pLTPos); //이거 위치 보정해야해
+        p.setDisable();
+
     }
 }

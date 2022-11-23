@@ -1,7 +1,8 @@
 import { Socket } from "socket.io-client";
-import { Iceball, PlayerList, Position, SessionInfo } from "./Protocol";
+import { Iceball, PlayerList, Position, ProjectileHitInfo, SessionInfo } from "./Protocol";
 import PlayGameScene from "../Scenes/PlayGameScene";
 import SocketManager from "../Core/SocketManager";
+import ProjectilePool from "../GameObjects/Pools/ProjectilePool";
 
 export const addClientProtocol = (socket:Socket, scene: PlayGameScene) => {
     socket.on("position", data => {
@@ -47,6 +48,28 @@ export const addClientProtocol = (socket:Socket, scene: PlayGameScene) => {
         }else {
             //아니면 다른애가 발사하게 함.
             scene.remotePlayers[iceball.ownerId].iceballAttack.fireProjectile(iceball);
+        }
+    });
+
+    //맞았다는 확인 오면
+    socket.on("hit_confirm", data => {
+        let hitInfo = data as ProjectileHitInfo;
+
+        ProjectilePool.Instance.searchAndDestroy(hitInfo.projectileId, hitInfo.projectileLTPosition);
+
+        if(hitInfo.playerId == socket.id) { //내가 맞은거면
+            scene.player.takeHit(1); //이부분 정정 필요
+            scene.player.removeWaiting(hitInfo.projectileId); //피격대기중이던거 정리
+            console.log("아야");
+            //내가 맞은거라면 나를 튕겨나가게 처리
+            let dir = hitInfo.projectileLTPosition.x - scene.player.x < 0 ? 1 : -1; //왼쪽 오른쪽
+            console.log(dir);
+            scene.player.bounceOff(new Phaser.Math.Vector2( dir, -1));
+        }else{
+            let target = scene.remotePlayers[hitInfo.playerId];
+            if(target == undefined) return;
+            target.removeWaiting(hitInfo.projectileId); //피격대기중이던거 정리
+            target.takeHit(1); //이부분 정정 필요
         }
     });
 };

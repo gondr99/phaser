@@ -21,6 +21,8 @@ export default class GameMap
 
     enemySpawns: Phaser.Types.Tilemaps.TiledObject[];
 
+    traps:Phaser.Tilemaps.TilemapLayer;
+
     constructor(scene: Phaser.Scene, key:string)
     {
         this.scene = scene;
@@ -49,6 +51,11 @@ export default class GameMap
 
         //아이템 레이어
         this.collectable = this.map.getObjectLayer("Collectables");
+        
+        //트랩 레이어
+        this.traps = this.map.createLayer("Traps", tileSet);
+        this.traps.setCollisionByExclusion([-1], true);
+
 
         this.colliders = this.map.createLayer("Colliders", tileSet);
         this.colliders.setVisible(false);

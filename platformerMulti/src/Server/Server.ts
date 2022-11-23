@@ -55,9 +55,8 @@ let sendPositionTimer:JobTimer = new JobTimer(50, ()=>{
 
 sendPositionTimer.startTimer();
 
-
 //모니터링 웹서버 부분
 app.get("/info", (req:Request, res:Response)=>{
     let list = SessionManager.Instance.getPlayerList();
     res.json({list});
-});
+});  

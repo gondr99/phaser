@@ -48,6 +48,7 @@ export default class Player extends CollideableObject
         this.setDepth(20); //플레이어의 소팅레이어을 20으로 설정한다.
     }
 
+
     init():void 
     {
         this.setOrigin(0.5, 1); //아래쪽 중앙에 잡아준다.
@@ -116,13 +117,12 @@ export default class Player extends CollideableObject
         } 
     }
 
-    takeHit(damage:number, dealer: Phaser.Types.Physics.Arcade.GameObjectWithBody): void 
+    takeHit(damage:number, direction:Phaser.Math.Vector2): void 
     {
         if(this.hasBeenHit) return;
-
+        
         this.hasBeenHit = true;
-        let dir = new Phaser.Math.Vector2(this.body.x - dealer.body.x, this.body.y - dealer.body.y);
-        dir = dir.normalize();
+        let dir = direction.normalize();
         dir.y = -1;
         this.bounceOff(dir);
         let tween = this.playDamageTweenAnimation();
@@ -152,8 +152,8 @@ export default class Player extends CollideableObject
     }
     
     update(time: number, delta: number): void {
-
         if(this.hasBeenHit) {return;}
+        
         const {left, right, space} = this.cursorsKey;
         const isSpaceJustDown :boolean = Phaser.Input.Keyboard.JustDown(space); //막 한번 눌린것만 체크
         this.isGround = this.body.onFloor();

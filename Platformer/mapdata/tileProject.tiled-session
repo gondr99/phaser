@@ -12,11 +12,11 @@
             "scaleInEditor": 1
         },
         "D:/dev/phaser/Platformer/src/assets/crystal_map.json": {
-            "scale": 1,
-            "selectedLayer": 5,
+            "scale": 2,
+            "selectedLayer": 6,
             "viewCenter": {
-                "x": 609.5,
-                "y": 230
+                "x": 770.75,
+                "y": 244.5
             }
         },
         "D:/dev/phaser/Platformer/src/assets/crystal_map.json#diamond": {
@@ -29,6 +29,7 @@
             "scaleInEditor": 1
         },
         "D:/dev/phaser/Platformer/src/assets/crystal_map.json#main_lev_build_2": {
+            "dynamicWrapping": false,
             "scaleInDock": 1
         },
         "stage1.tmx": {

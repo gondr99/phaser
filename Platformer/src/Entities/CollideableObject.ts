@@ -2,9 +2,9 @@ import Phaser from 'phaser';
 
 export default class CollideableObject extends Phaser.Physics.Arcade.Sprite
 {
-    addCollider(other : Phaser.GameObjects.GameObject | Phaser.GameObjects.Group) : CollideableObject
+    addCollider(other : Phaser.GameObjects.GameObject | Phaser.GameObjects.Group, Callback:ArcadePhysicsCallback | undefined , context:any) : CollideableObject
     {
-        this.scene.physics.add.collider(this, other);
+        this.scene.physics.add.collider(this, other, Callback, undefined, context);
         return this;
     }
  
@@ -13,4 +13,5 @@ export default class CollideableObject extends Phaser.Physics.Arcade.Sprite
         this.scene.physics.add.overlap(this, other, Callback, undefined, context);
         return this;
     }
+
 }
