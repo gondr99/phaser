@@ -13,6 +13,7 @@ import MeleeWeapon from '../Entities/Weapons/MeleeWeapon';
 import Collectable from '../Entities/Collectables/Collectable';
 import Collectables from '../Groups/Collectables';
 import CollideableObject from '../Entities/CollideableObject';
+import EventEmitter from '../Events/Emitter';
 
 export default class PlayGameScene extends Phaser.Scene {
     
@@ -22,7 +23,7 @@ export default class PlayGameScene extends Phaser.Scene {
     collectables:Collectables;
     gameScore:number = 0;
 
-
+    initPlayerHealth:number = 10;
     constructor()
     {
         super({key:"PlayGameScene"});
@@ -30,10 +31,13 @@ export default class PlayGameScene extends Phaser.Scene {
 
     create() : void
     {
-        GameMap.Instance = new GameMap( this, "cmap");
+        let level = this.registry.get("level") as string;
+
+        GameMap.Instance = new GameMap( this, "cmap" + level);
         UIManager.Instance = new UIManager(this);
         ProjectilePool.Instance = new ProjectilePool(this);
         EffectManager.Instance = new EffectManager(this);
+        EventEmitter.Instance = new EventEmitter(); //이벤트 에미터 생성
 
         ExtraAnimation(this.anims); //기타 애니메이션 로딩, 피격이펙트 스윙이펙트 등등
 
@@ -47,6 +51,11 @@ export default class PlayGameScene extends Phaser.Scene {
         this.player.addOverlap(this.collectables, this.onCollect, this);
         this.player.addCollider(GameMap.Instance.traps, this.onPlayerHitByTrap, this)
             .addCollider(this.enemies, this.onPlayerHit, this);
+
+
+        this.createGameEvent();
+
+        this.gameScore = 0;
     }
 
     //보석 레이어 생성
@@ -59,18 +68,31 @@ export default class PlayGameScene extends Phaser.Scene {
         this.collectables.playAnimation("diamond_shine");
         
     }
+
+
     createPlayer(speed:number, jumpPower:number) : void 
     {
         let {x, y} = GameMap.Instance.playerZones["startZone"]
-        this.player = new Player(this, x as number, y as number, "player", speed, jumpPower, 10);
+        this.player = new Player(this, x as number, y as number, "player", speed, jumpPower, this.initPlayerHealth); //체력은 나중에 조절
 
         const EndOfLevelOverlap: Phaser.Physics.Arcade.Collider = this.physics.add.overlap(this.player, GameMap.Instance.endZone, ()=> {
             //닿았을 때 처리. 한번만 작동하고 멈추도록
             EndOfLevelOverlap.active = false;
             console.log("Player reach to endzone") ;
+            // let nextLevel = this.registry.get('level') as number + 1;
+            // this.registry.set('level', nextLevel);
+            
+            this.gotoNextLevel();            
         });
-
        
+    }
+
+    createGameEvent(): void 
+    {
+        EventEmitter.Instance.on("PLAYER_DEAD", () => {
+            console.log("Gameover");
+            this.setGameOver();
+        });
     }
 
 
@@ -83,7 +105,6 @@ export default class PlayGameScene extends Phaser.Scene {
         jewel.disableBody(true, true);
         
         this.gameScore += jewel.score; //점수 증가
-        console.log(this.gameScore);
 
         UIManager.Instance.hud.updateScoreText(this.gameScore);
     }
@@ -151,6 +172,26 @@ export default class PlayGameScene extends Phaser.Scene {
             melee.createExplosion(enemy); //성공했다면 피격 마크 띄움
         }; //칼의 데미지 만큼 입히고
         
+    }
+
+    gotoNextLevel():void 
+    {
+        this.registry.inc('level', 1); //레벨 증가
+        this.events.off(Phaser.Scenes.Events.UPDATE);
+        this.scene.restart();
+    }
+
+    setGameOver(): void 
+    {
+        //씬에 붙어있는 전역 레지스트리와 이벤트들을 리셋시켜줘야 사라진 에네미나 플레이어들이 문제다.
+        //this.registry.destroy();
+
+        this.events.off(Phaser.Scenes.Events.UPDATE);
+        this.scene.start("PlayGameScene");
+    }
+
+    update(time: number, delta: number): void {
+        GameMap.Instance.updateMap(time, delta); //패럴렉스 업데이트
     }
 }
 

@@ -5,6 +5,8 @@ import UIManager from '../Core/UIManager';
 import ProjectilePool from './Weapons/ProjectilePool';
 import { GetTimestamp, CheckAnimationPlay } from '../Core/GameUtil';
 import MeleeWeapon from './Weapons/MeleeWeapon';
+import EventEmitter from '../Events/Emitter';
+import { GameOption } from '../GameOption';
 
 
 //export type ArcadeSpriteWithBody = Phaser.Physics.Arcade.Sprite & {body: Phaser.Physics.Arcade.Body};
@@ -117,6 +119,7 @@ export default class Player extends CollideableObject
         } 
     }
 
+    //피격처리와 튕겨나갈 방향
     takeHit(damage:number, direction:Phaser.Math.Vector2): void 
     {
         if(this.hasBeenHit) return;
@@ -125,13 +128,20 @@ export default class Player extends CollideableObject
         let dir = direction.normalize();
         dir.y = -1;
         this.bounceOff(dir);
+        
+        this.health -= damage;
+
+        if(this.health <= 0)
+        {
+            EventEmitter.Instance.emit("PLAYER_DEAD");
+            return;
+        }
+
         let tween = this.playDamageTweenAnimation();
         this.scene.time.delayedCall(1000, ()=> {
             this.hasBeenHit = false;
             tween.stop(0); //원래 상태로
         });
-
-        this.health -= damage;
 
         UIManager.Instance.healthBar.setHealth(this.health / this.maxHealth);
     }
@@ -152,6 +162,9 @@ export default class Player extends CollideableObject
     }
     
     update(time: number, delta: number): void {
+        if(this.y > GameOption.height + 20) {
+            EventEmitter.Instance.emit("PLAYER_DEAD");
+        }
         if(this.hasBeenHit) {return;}
         
         const {left, right, space} = this.cursorsKey;

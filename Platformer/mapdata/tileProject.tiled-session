@@ -9,15 +9,29 @@
     ],
     "fileStates": {
         "": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "D:/dev/phaser/Platformer/src/assets/crystal_map.json": {
-            "scale": 2,
-            "selectedLayer": 6,
+            "scale": 0.75,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 770.75,
-                "y": 244.5
+                "x": 547.3333333333334,
+                "y": 297.33333333333326
             }
+        },
+        "D:/dev/phaser/Platformer/src/assets/crystal_map.json#background": {
+            "dynamicWrapping": true,
+            "scaleInEditor": 1
+        },
+        "D:/dev/phaser/Platformer/src/assets/crystal_map.json#bg_spikes_dark": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "D:/dev/phaser/Platformer/src/assets/crystal_map.json#bg_spikes_tileset": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "D:/dev/phaser/Platformer/src/assets/crystal_map.json#diamond": {
             "dynamicWrapping": true,
@@ -31,6 +45,12 @@
         "D:/dev/phaser/Platformer/src/assets/crystal_map.json#main_lev_build_2": {
             "dynamicWrapping": false,
             "scaleInDock": 1
+        },
+        "D:/dev/phaser/Platformer/src/assets/crystal_map_level2.json#diamond": {
+            "dynamicWrapping": true
+        },
+        "D:/dev/phaser/Platformer/src/assets/crystal_map_level2.json#main_lev_build_1": {
+            "dynamicWrapping": false
         },
         "stage1.tmx": {
             "scale": 0.40315625,
@@ -63,5 +83,6 @@
     "tileset.tileSize": {
         "height": 16,
         "width": 16
-    }
+    },
+    "tileset.type": 0
 }

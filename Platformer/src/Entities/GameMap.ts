@@ -1,5 +1,6 @@
 import Phaser, { Scenes } from 'phaser';
 import UIManager from '../Core/UIManager';
+import { GameOption } from '../GameOption';
 
 export interface Zone 
 {
@@ -23,15 +24,20 @@ export default class GameMap
 
     traps:Phaser.Tilemaps.TilemapLayer;
 
+    spikeImage: Phaser.GameObjects.TileSprite;
+    skyImage: Phaser.GameObjects.TileSprite;
+
     constructor(scene: Phaser.Scene, key:string)
     {
         this.scene = scene;
         this.map = scene.make.tilemap({key});
         this.map.addTilesetImage("main_lev_build_1", "tiles-1");
+        this.map.addTilesetImage("bg_spikes_tileset", "bg_spike_tileset_image");
+
+        this.createBackground(); //배경 생성
 
         this.createLayer();
         this.createEndOfLevel();
-        
     }
 
 
@@ -65,6 +71,35 @@ export default class GameMap
         this.colliders.setCollisionByProperty({collide:true}, true);
     }
     
+    createBackground():void 
+    {
+        const tileSet: Phaser.Tilemaps.Tileset = this.map.getTileset("bg_spikes_tileset");
+        this.map.createLayer("Distance", tileSet);
+
+        const bg: Phaser.Types.Tilemaps.TiledObject = this.map.getObjectLayer("Distance_BG").objects[0];
+        let {width, height } = GameOption;
+        this.spikeImage = this.scene.add.tileSprite(bg.x as number, bg.y as number, 
+            width, bg.height as number, "bg_spikes_dark")
+            .setOrigin(0, 1)
+            .setDepth(-10)
+            .setScrollFactor(0, 1);
+
+
+        //const skyBG: Phaser.Types.Tilemaps.TiledObject = this.map.getObjectLayer("Distance_skyBG").objects[1];
+        this.skyImage = this.scene.add.tileSprite(0, 0, width, 220 as number, "sky_play")
+            .setOrigin(0, 0)
+            .setDepth(-15)
+            .setScale(1, 1)
+            .setScrollFactor(0, 1);
+    }
+
+    updateMap(time:number, delta:number): void 
+    {
+        //이런거 안해도 스크롤팩터가 그런 역할을 해...-_-;; //근데 스크롤팩터는 좌표 자체를 이동시켜
+        this.spikeImage.tilePositionX = this.scene.cameras.main.scrollX * 0.3;
+        this.skyImage.tilePositionX = this.scene.cameras.main.scrollX * 0.1;
+    }
+
     createEndOfLevel():void 
     {
         const end: Phaser.Types.Tilemaps.TiledObject = this.playerZones["endZone"];
