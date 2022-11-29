@@ -1,4 +1,5 @@
 import KeyCodes = Phaser.Input.Keyboard.KeyCodes;
+import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 
 export class PlayGameScene extends Phaser.Scene {
     debugText: Phaser.GameObjects.Text;
@@ -20,6 +21,8 @@ export class PlayGameScene extends Phaser.Scene {
     halfGameWidth: number;
     gameHeight: number;
 
+    rexUI: UIPlugin;
+
     constructor()
     {
         super("PlayGameScene");
@@ -30,6 +33,9 @@ export class PlayGameScene extends Phaser.Scene {
         this.load.image("highlight", "assets/highlight.png");
     }
     create() : void {
+
+        console.log(this.rexUI);
+
         //게임의 절반크기와 높이를 구해주고
         this.halfGameWidth = this.game.config.width as number / 2;
         this.gameHeight = this.game.config.height as number;

@@ -1,7 +1,6 @@
 import 'phaser';
 import { PlayGameScene } from './PlayGameScene';
 
-
 const scaleObject : Phaser.Types.Core.ScaleConfig = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
@@ -10,7 +9,7 @@ const scaleObject : Phaser.Types.Core.ScaleConfig = {
     height:500,
 }
 
-let config = {
+let config : Phaser.Types.Core.GameConfig = {
     type:Phaser.AUTO,
     scale: scaleObject,
     scene: [PlayGameScene]
