@@ -24,7 +24,15 @@ export default class ProjectilePool extends Phaser.Physics.Arcade.Group
 
     getProjectile(): Projectile
     {
-        const projectile = this.getFirstDead(true) as Projectile; //만약 없으면 생성까지
+        //가져오는게 null일경우 새로 만들어서 셋팅
+        let projectile: Projectile | null = this.getFirstDead(false) as Projectile; //만약 없으면 생성까지
+        if(projectile == null)
+        {
+            projectile = new Projectile(this.scene, 0, 0, "iceball");
+            this.add(projectile);
+            this.pool.push(projectile);
+            projectile.body.setAllowGravity(false);
+        }
         projectile.setActive(true);
         projectile.setVisible(true);
         return projectile;

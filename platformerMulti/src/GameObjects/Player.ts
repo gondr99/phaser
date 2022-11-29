@@ -1,7 +1,9 @@
 import Phaser from "phaser";
 import InitPlayerAnimation from "../Animation/PlayerAnimation";
 import { CheckAnimationPlay } from "../Core/GameUtil";
-import { SessionInfo } from "../Network/Protocol";
+import SocketManager from "../Core/SocketManager";
+import { DeadInfo, Position, SessionInfo } from "../Network/Protocol";
+import HealthBar from "./HealthBar";
 import PlayerAttack from "./PlayerAttack";
 
 export default class Player extends Phaser.Physics.Arcade.Sprite
@@ -26,6 +28,14 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
     hasBeenHit:boolean = false; //피격중에는 다시 안맞게
     bouncePower:number = 250; //튕겨나가는 힘
 
+
+    healthBar:HealthBar;
+
+    maxHp:number = 10;
+    hp:number = 10;
+    
+    isDead:boolean = false;
+
     constructor(scene: Phaser.Scene, x:number, y:number, 
         key:string, speed:number, jumpPower:number, isRemote:boolean, id:string)
     {
@@ -39,7 +49,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
 
         //공격 객체 할당
         this.iceballAttack = new PlayerAttack(this);
-        this.init();
+        
+        this.init(20);//초기 HP할당
+
+        this.healthBar = new HealthBar(scene, x - 32 * 0.5, y - 38 * 0.5 - 15,  32, 5, 2);
     }
 
     isWaitingForHitConfirm(projectileId:number) : boolean
@@ -62,16 +75,69 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
     //피격당했을 때
     takeHit(damage: number): void 
     {
-        if(this.hasBeenHit) return;
+        if(this.hasBeenHit || this.isDead) return;
         this.hasBeenHit = true;
 
-        let tween = this.playDamageTweenAnimation();
-        this.scene.time.delayedCall(1000, ()=> {
-            this.hasBeenHit = false;
-            tween.stop(0); //원래 상태로
-        });
-
         //여기에 데미지 처리 식 들어가야 한다.
+        this.hp -= damage;
+        if(this.hp <= 0) {
+            this.hp = 0;
+            this.setDead();
+        }else {
+            let tween = this.playDamageTweenAnimation();
+            this.scene.time.delayedCall(1000, ()=> {
+                this.hasBeenHit = false;
+                tween.stop(0); //원래 상태로
+            });
+        }
+
+        this.healthBar.setHealth(this.hp / this.maxHp);
+    }
+
+    setDead(): void 
+    {
+        console.log("dead");
+        this.hasBeenHit = false;
+        this.setTint(0xff0000);
+        this.body.checkCollision.none = true;
+        this.setCollideWorldBounds(false);
+        
+        this.isDead = true;
+        //조종하고 있던 캐릭터면 
+        if(this.isRemote == false)
+        {
+            this.setVelocity(0, -200);
+            //2초 이후에 서버로 딜레이 콜을 날려서 해당 캐릭터를 지우고 카운트 다운 시작하도록
+            this.scene.time.delayedCall(2000, () => {
+                let info: DeadInfo = {playerId: this.id}
+                this.setActive(false);
+                this.setVisible(false);
+                SocketManager.Instance.sendData("player_dead", info);
+            });
+        }
+    }
+
+    revive(position:Position): void 
+    {
+        this.setActive(true);
+        this.setVisible(true);
+        
+        let {x, y} = position;
+        this.body.reset(x, y);
+        this.x = x;
+        this.y = y;
+
+        this.clearTint();
+        this.body.checkCollision.none = false;
+        this.setCollideWorldBounds(true);
+
+        this.isDead = false;
+
+        this.hp = this.maxHp;
+        this.healthBar.setHealth(this.hp/ this.maxHp);
+
+        console.log("개같이 부활!");
+        
     }
 
     bounceOff(dir: Phaser.Math.Vector2) {
@@ -89,8 +155,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
         });
     }
 
-    init(): void 
+    init(maxHP:number): void 
     {
+        this.maxHp = this.hp = maxHP;
+
         this.setCollideWorldBounds(true); //월드 경계선과 충돌
         InitPlayerAnimation(this.scene.anims); //플레이어 애니메이션을 만들어주고
         if(this.isRemote == false){
@@ -126,6 +194,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
 
     setInfoSync(info: SessionInfo)
     {
+        //console.log("sync");
         this.x = info.position.x;
         this.y = info.position.y;
         this.setFlipX(info.flipX);
@@ -147,10 +216,16 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
         return this.body.velocity.length() > 0.1;
     }
 
+    preUpdate(time: number, delta: number): void {
+        super.preUpdate(time, delta);
+        this.healthBar.move(this.x - 32 * 0.5, this.y - 38 * 0.5 - 15);
+    }
+
     update(time: number, delta: number): void 
     {
         if(this.hasBeenHit ) return;
         if(this.cursorsKey == undefined) return;
+        if(this.isDead == true) return; //사망시에는 처리 안함.
 
         const {left, right, space} = this.cursorsKey;
         const isSpaceJustDown: boolean = Phaser.Input.Keyboard.JustDown(space);

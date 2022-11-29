@@ -35,7 +35,11 @@ export default class Player extends CollideableObject
     meleeCoolDown:number = 400; //0.4초
     lastMeleeTime:number = 0;
     body:Phaser.Physics.Arcade.Body;
-    
+
+    jumpSound:Phaser.Sound.BaseSound;
+    projectileSound:Phaser.Sound.BaseSound;
+    swipeSound:Phaser.Sound.BaseSound;
+
     constructor(scene:Phaser.Scene, x:number, y:number, key:string, speed:number, jumpPower:number, health:number)
     {
         super(scene, x, y, key);
@@ -48,6 +52,10 @@ export default class Player extends CollideableObject
         
         this.init();
         this.setDepth(20); //플레이어의 소팅레이어을 20으로 설정한다.
+
+        this.jumpSound = this.scene.sound.add("jump", {volume:0.5});
+        this.projectileSound = this.scene.sound.add("projectile-launch", {volume:0.5});
+        this.swipeSound = this.scene.sound.add("swipe", {volume:0.5});
     }
 
 
@@ -82,6 +90,7 @@ export default class Player extends CollideableObject
         if(this.meleeCoolDown + this.lastMeleeTime > GetTimestamp()) return;
         this.lastMeleeTime = GetTimestamp();
 
+        this.swipeSound.play();
         this.play("throw", true);
         this.meleeWeapon.swing(this, this.flipX ? -1 : 1);
     }
@@ -103,6 +112,7 @@ export default class Player extends CollideableObject
 
         p.fire(center, 500, 1, dir, this.projectileDamage);
 
+        this.projectileSound.play();
         this.play("throw", true);
     }
 
@@ -116,6 +126,7 @@ export default class Player extends CollideableObject
         this.currentJumpCount++;
         if(this.isGround || this.currentJumpCount <= this.maxJumpCount ){
             this.setVelocityY(-this.jumpPower);
+            this.jumpSound.play();
         } 
     }
 

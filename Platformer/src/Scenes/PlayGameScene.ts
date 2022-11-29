@@ -24,6 +24,8 @@ export default class PlayGameScene extends Phaser.Scene {
     gameScore:number = 0;
 
     initPlayerHealth:number = 10;
+
+    bgMusic:Phaser.Sound.BaseSound;
     constructor()
     {
         super({key:"PlayGameScene"});
@@ -55,7 +57,31 @@ export default class PlayGameScene extends Phaser.Scene {
 
         this.createGameEvent();
 
+        this.playBackgroundMusic();
+
         this.gameScore = 0;
+        const rightEnd = GameOption.width - (GameOption.width - GameOption.realWidth) * 0.5;
+        const bottomEnd = GameOption.height - (GameOption.height - GameOption.realHeight) * 0.5;
+        const backBtn = this.add.image( rightEnd - 10, bottomEnd - 10, 'back')
+                            .setOrigin(1, 1)
+                            .setScale(2)
+                            .setInteractive()
+                            .setScrollFactor(0);
+        //백버튼 누르면 메뉴씬으로 이동한다.
+        backBtn.on("pointerup", ()=>{
+            this.cleanUp();
+            this.scene.start("MenuScene");
+        });
+    }
+
+    playBackgroundMusic():void 
+    {
+        if(!this.bgMusic)
+        {
+            this.bgMusic = this.sound.add("theme", {loop:true, volume:0.1});
+        }
+        
+        this.bgMusic.play();
     }
 
     //보석 레이어 생성
@@ -81,7 +107,6 @@ export default class PlayGameScene extends Phaser.Scene {
             console.log("Player reach to endzone") ;
             // let nextLevel = this.registry.get('level') as number + 1;
             // this.registry.set('level', nextLevel);
-            
             this.gotoNextLevel();            
         });
        
@@ -177,16 +202,33 @@ export default class PlayGameScene extends Phaser.Scene {
     gotoNextLevel():void 
     {
         this.registry.inc('level', 1); //레벨 증가
-        this.events.off(Phaser.Scenes.Events.UPDATE);
+        let level:number = this.registry.get("level") as number;
+
+        if(level > GameOption.lastLevel) 
+        {
+            this.scene.start("EndingScene");
+            return;
+        }
+
+        let maxLevel:number = this.registry.get("unlocked-levels") as number;
+        if(level > maxLevel){
+            this.registry.set("unlocked-levels", level);
+        }
+        this.cleanUp();
         this.scene.restart();
+    }
+
+    cleanUp():void 
+    {
+        this.bgMusic.stop();
+        this.events.off(Phaser.Scenes.Events.UPDATE);
     }
 
     setGameOver(): void 
     {
         //씬에 붙어있는 전역 레지스트리와 이벤트들을 리셋시켜줘야 사라진 에네미나 플레이어들이 문제다.
         //this.registry.destroy();
-
-        this.events.off(Phaser.Scenes.Events.UPDATE);
+        this.cleanUp();
         this.scene.start("PlayGameScene");
     }
 

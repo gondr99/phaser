@@ -48,13 +48,15 @@ export default class PlayGameScene extends Phaser.Scene
 
     createPlayer(x:number, y:number, speed:number, jumpPower:number, id:string, isRemote:boolean = false) : void
     {
+        console.log(x, y);
         if(isRemote) 
         {
             this.remotePlayers[id] = new Player(this, x, y, "player", speed, jumpPower, isRemote,id);
         }else {
             this.player = new Player(this, x, y, "player", speed, jumpPower, isRemote,id);
             this.physics.add.collider(this.player, MapManager.Instance.collisions);
-            this.physics.add.collider(this.player, ProjectilePool.Instance.pool, this.hitByProjectile, undefined, this);
+            this.physics.add.collider(this.player, ProjectilePool.Instance.pool, 
+                this.hitByProjectile, undefined, this);
 
         }
     }
@@ -73,13 +75,14 @@ export default class PlayGameScene extends Phaser.Scene
         let hitData: ProjectileHitInfo = {
             playerId:SocketManager.Instance.socket.id, 
             projectileId: p.projectileId,
-            projectileLTPosition: {x, y}
+            projectileLTPosition: {x, y},
+            damage: p.damage
         };
         SocketManager.Instance.sendData("hit_report", hitData);
     }
 
     update(time: number, delta: number): void {
-        if(this.player == undefined) return;
+        if(this.player == undefined || this.player.active == false) return;
         this.syncTimer += delta;
         if(this.syncTimer >= 50) {
             this.syncTimer = 0;
@@ -91,13 +94,13 @@ export default class PlayGameScene extends Phaser.Scene
                 isMoving: this.player.isMoving(),
                 position:{x:this.player.x, y:this.player.y}
             };
-            SocketManager.Instance.sendData("info_sync", playerInfo);
-                
+            SocketManager.Instance.sendData("info_sync", playerInfo);       
         }
     }
 
     removeRemotePlayer(id:string)
     {
+        this.remotePlayers[id].healthBar.bar.destroy(); //헬스바 지우고
         this.remotePlayers[id].destroy(); //실제 오브젝트 지우고 
         delete this.remotePlayers[id]; //원격 플레이어에서도 빼버리고
     }

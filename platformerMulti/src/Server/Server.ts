@@ -7,6 +7,7 @@ import Session from './Session';
 import MapManager from './ServerMapManager';
 import { addServerSocketListener } from '../Network/ServerListener';
 import JobTimer from './JobTimer';
+import ServerMapManager from './ServerMapManager';
 
 //익스프레스 웹 엔진을 만들어주고
 const app: Application = Express();
@@ -58,5 +59,8 @@ sendPositionTimer.startTimer();
 //모니터링 웹서버 부분
 app.get("/info", (req:Request, res:Response)=>{
     let list = SessionManager.Instance.getPlayerList();
-    res.json({list});
+    let spawn = ServerMapManager.Instance.spawnPoints;
+    res.json({list, spawn});
+
+    
 });  

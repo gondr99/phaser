@@ -1,5 +1,5 @@
 import { Socket } from "socket.io-client";
-import { Iceball, PlayerList, Position, ProjectileHitInfo, SessionInfo } from "./Protocol";
+import { DeadInfo, Iceball, PlayerList, Position, ProjectileHitInfo, ReviveInfo, SessionInfo } from "./Protocol";
 import PlayGameScene from "../Scenes/PlayGameScene";
 import SocketManager from "../Core/SocketManager";
 import ProjectilePool from "../GameObjects/Pools/ProjectilePool";
@@ -58,18 +58,36 @@ export const addClientProtocol = (socket:Socket, scene: PlayGameScene) => {
         ProjectilePool.Instance.searchAndDestroy(hitInfo.projectileId, hitInfo.projectileLTPosition);
 
         if(hitInfo.playerId == socket.id) { //내가 맞은거면
-            scene.player.takeHit(1); //이부분 정정 필요
             scene.player.removeWaiting(hitInfo.projectileId); //피격대기중이던거 정리
-            console.log("아야");
             //내가 맞은거라면 나를 튕겨나가게 처리
             let dir = hitInfo.projectileLTPosition.x - scene.player.x < 0 ? 1 : -1; //왼쪽 오른쪽
-            console.log(dir);
+            
             scene.player.bounceOff(new Phaser.Math.Vector2( dir, -1));
+            scene.player.takeHit(hitInfo.damage); //데미지 처리
         }else{
             let target = scene.remotePlayers[hitInfo.playerId];
             if(target == undefined) return;
             target.removeWaiting(hitInfo.projectileId); //피격대기중이던거 정리
-            target.takeHit(1); //이부분 정정 필요
+            target.takeHit(hitInfo.damage); 
+        }
+    });
+
+    //자기자신은 빼고 올테니까
+    socket.on("player_dead", data => {
+        let info = data as DeadInfo;
+        scene.remotePlayers[info.playerId].isDead = true;
+        scene.remotePlayers[info.playerId].setActive(false);
+        scene.remotePlayers[info.playerId].setVisible(false);
+    });
+
+    socket.on("player_revive", data => {
+        let info = data as ReviveInfo;
+        
+        if(info.playerId == socket.id)
+        {
+            scene.player.revive(info.info.position);
+        }else {
+            scene.remotePlayers[info.playerId].revive(info.info.position);
         }
     });
 };

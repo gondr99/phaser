@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "D:/dev/phaser/Platformer/src/assets/crystal_map.json",
+    "activeFile": "D:/dev/phaser/Platformer/src/assets/crystal_map_level2.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -46,11 +46,31 @@
             "dynamicWrapping": false,
             "scaleInDock": 1
         },
+        "D:/dev/phaser/Platformer/src/assets/crystal_map_level2.json": {
+            "scale": 0.75,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 630,
+                "y": 416
+            }
+        },
+        "D:/dev/phaser/Platformer/src/assets/crystal_map_level2.json#bg_spikes_dark": {
+            "scaleInDock": 1
+        },
+        "D:/dev/phaser/Platformer/src/assets/crystal_map_level2.json#bg_spikes_tileset": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
         "D:/dev/phaser/Platformer/src/assets/crystal_map_level2.json#diamond": {
-            "dynamicWrapping": true
+            "dynamicWrapping": true,
+            "scaleInDock": 1
         },
         "D:/dev/phaser/Platformer/src/assets/crystal_map_level2.json#main_lev_build_1": {
-            "dynamicWrapping": false
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "D:/dev/phaser/Platformer/src/assets/crystal_map_level2.json#main_lev_build_2": {
+            "scaleInDock": 1
         },
         "stage1.tmx": {
             "scale": 0.40315625,
@@ -71,11 +91,12 @@
     "map.tileWidth": 16,
     "map.width": 100,
     "openFiles": [
-        "D:/dev/phaser/Platformer/src/assets/crystal_map.json"
+        "D:/dev/phaser/Platformer/src/assets/crystal_map_level2.json"
     ],
     "project": "tileProject.tiled-project",
     "property.type": "int",
     "recentFiles": [
+        "D:/dev/phaser/Platformer/src/assets/crystal_map_level2.json",
         "D:/dev/phaser/Platformer/src/assets/crystal_map.json",
         "stage1.tmx"
     ],

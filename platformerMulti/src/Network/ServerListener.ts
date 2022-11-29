@@ -2,7 +2,7 @@ import {Socket} from 'socket.io';
 import ServerMapManager from '../Server/ServerMapManager';
 import Session from '../Server/Session';
 import SessionManager from '../Server/SessionManager';
-import { Iceball, ProjectileHitInfo, SessionInfo } from './Protocol';
+import { DeadInfo, Iceball, ProjectileHitInfo, ReviveInfo, SessionInfo } from './Protocol';
 
 export const addServerSocketListener = (socket:Socket, session:Session) => {
     //이안에서 세션은 클로져 되어 보존됨.
@@ -55,6 +55,20 @@ export const addServerSocketListener = (socket:Socket, session:Session) => {
         
         SessionManager.Instance.broadcast("hit_confirm", hitInfo, socket.id, false); 
         
+    });
+
+    socket.on("player_dead", data => {
+        let deadInfo = data as DeadInfo;
+        SessionManager.Instance.broadcast("player_dead", deadInfo, socket.id, true); //센더 제외 알려주기
+        //10초 후 부활
+        setTimeout(()=> {
+            let posIndex:number = Math.floor( Math.random() * ServerMapManager.Instance.spawnPoints.length);
+            let pos = ServerMapManager.Instance.spawnPoints[posIndex];
+            session.setPosition( pos); 
+
+            let reviveInfo: ReviveInfo = {playerId:deadInfo.playerId, info:session.toJson()};
+            SessionManager.Instance.broadcast("player_revive", reviveInfo, socket.id, false); //전원에게 알려주기
+        }, 1000 * 5); 
     });
 
     socket.on("disconnect", reason => {

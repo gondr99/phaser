@@ -3,6 +3,8 @@ import PlayGameScene from './Scenes/PlayGameScene';
 import PreloadAssetScene from './Scenes/PreloadAssetScene';
 import {GameOption} from './GameOption';
 import MenuScene from './Scenes/MenuScene';
+import LevelScene from './Scenes/LevelScene';
+import EndingScene from './Scenes/EndingScene';
 
 
 let scaleObject: Phaser.Types.Core.ScaleConfig = {
@@ -25,7 +27,7 @@ let config : Phaser.Types.Core.GameConfig = {
     physics: physicsConfig,
     type: Phaser.AUTO,
     scale: scaleObject,
-    scene: [PreloadAssetScene, MenuScene, PlayGameScene],
+    scene: [PreloadAssetScene, MenuScene, PlayGameScene, LevelScene, EndingScene],
     pixelArt:true
 };
 

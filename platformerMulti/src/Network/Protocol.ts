@@ -26,6 +26,7 @@ export interface Iceball
     direction:number;
     velocity:Position;
     lifetime:number;
+    damage:number;
 }
 
 export interface ProjectileHitInfo
@@ -33,5 +34,17 @@ export interface ProjectileHitInfo
     projectileId:number; //피격한 투사체의 아이디
     playerId:string; //피격당한 녀석
     projectileLTPosition:Position; //투사체의 왼쪽 상단 위치
+    damage:number;
 }
 //플레이어 크기는 32X38, 투사체 크기는 20X20 이다.
+
+export interface DeadInfo
+{
+    playerId:string;
+}
+
+export interface ReviveInfo
+{
+    playerId:string;
+    info:SessionInfo;
+}

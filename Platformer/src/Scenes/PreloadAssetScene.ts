@@ -14,7 +14,10 @@ export default class PreloadAssetScene extends Phaser.Scene
         this.load.tilemapTiledJSON("cmap2", "assets/crystal_map_level2.json");
         this.load.image("tiles-1", "assets/main_lev_build_1.png");
         this.load.image("tiles-2", "assets/main_lev_build_2.png");
-        this.load.image("bg_spike_tileset_image", "assets/bg_spikes_tileset.png")
+        this.load.image("bg_spike_tileset_image", "assets/bg_spikes_tileset.png");
+
+        //UI 이미지 로드
+        this.load.image('back', 'assets/back.png');
 
         //플레이어 이미지 로드
         //this.load.image("player", "assets/player/movements/idle01.png");
@@ -77,6 +80,15 @@ export default class PreloadAssetScene extends Phaser.Scene
         //메뉴씬 이미지 로딩
         this.load.image("menu_bg", "assets/background01.png");
 
+        this.load.audio('theme', 'assets/music/theme_music.wav');
+
+        this.load.audio('projectile-launch', 'assets/music/projectile_launch.wav');
+        this.load.audio('running', 'assets/music/step_mud.wav');
+        this.load.audio('jump', 'assets/music/jump.wav');
+        this.load.audio('swipe', 'assets/music/swipe.wav');
+        this.load.audio('coin-pickup', 'assets/music/coin_pickup.wav');
+
+
         //loader 플러그인에 complete 이벤트에 한번만 리스너를 달아준다.
         this.load.once("complete", () => {
             this.startGame();
@@ -86,6 +98,7 @@ export default class PreloadAssetScene extends Phaser.Scene
     //씬간의 데이터 전송을 위해 registry를 사용
     startGame() {
         this.registry.set("level", 1);
+        this.registry.set("unlocked-levels", 2);
         this.scene.start("MenuScene");
     }
 

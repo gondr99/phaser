@@ -5,6 +5,7 @@ export interface MenuItem {
     scene: string | null;
     text: string;
     textGO?: Phaser.GameObjects.Text;
+    level?:number;
 }
 
 export type SetupMenuFn = (arg: MenuItem) => void;
@@ -24,7 +25,7 @@ export default class MenuScene extends Phaser.Scene {
         super("MenuScene");
         this.menu = [
             { scene: 'PlayGameScene', text: 'Play' },
-            { scene: 'LevelChooseScene', text: 'Levels' },
+            { scene: 'LevelScene', text: 'Levels' },
             { scene: null, text: 'Exit' },
         ]
         this.screenWidth = GameOption.width;

@@ -24,7 +24,7 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite
     }
 
     //처음 할때는 그냥 발사부터 놓고 그걸 네트워크로 고치는 과정으로 수업
-    initAndFire(pos:Position, lifeTime:number, speed:number, direction:number, ownerId:string, projectileId:number): void 
+    initAndFire(pos:Position, lifeTime:number, speed:number, direction:number, ownerId:string, projectileId:number, damage:number): void 
     {
         this.projectileId = projectileId;
         this.lifeTime = 0;
@@ -33,6 +33,8 @@ export default class Projectile extends Phaser.Physics.Arcade.Sprite
         this.y = pos.y;
         this.ownerId = ownerId;
         this.setFlipX(direction < 0); //뒤집을 준비
+
+        this.damage = damage;
         this.setVelocityX(speed);
     }
 
