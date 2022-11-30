@@ -5,6 +5,14 @@ export default class Room
 {
     socketMap:SessionMap = {}; //해당 룸에 들어온 소켓들
 
+    enterRoom():void 
+    {
+
+    }
+
+    leaveRoom():void 
+    {}
+
     broadcast(protocol:string, msgJSON:object, senderKey:string, exceptSender:boolean = false): void 
     {
         for(let key in this.socketMap)
