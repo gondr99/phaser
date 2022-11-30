@@ -1,7 +1,7 @@
 import { SessionInfo } from "../Network/Protocol";
 import Session from "./Session";
 
-interface SessionMap 
+export interface SessionMap 
 {
     [key:string] : Session
 }

@@ -3,8 +3,16 @@ import { DeadInfo, Iceball, PlayerList, Position, ProjectileHitInfo, ReviveInfo,
 import PlayGameScene from "../Scenes/PlayGameScene";
 import SocketManager from "../Core/SocketManager";
 import ProjectilePool from "../GameObjects/Pools/ProjectilePool";
+import LobbyScene from "../Scenes/LobbyScene";
 
-export const addClientProtocol = (socket:Socket, scene: PlayGameScene) => {
+export const addLobbySceneProtocol = (socket:Socket, scene:LobbyScene) => {
+    socket.on("login_confirm", data => {
+        //수신된 데이터는 그리 중요하지 않다. 메시지 받았으면 로비씬에서 로비 페이지로 전환일으키면 된다.
+        scene.changeToLobby();
+    });
+};
+
+export const addGameSceneProtocol = (socket:Socket, scene: PlayGameScene) => {
     socket.on("position", data => {
         let pos = data as Position;
         scene.onCompleteConnection(pos.x, pos.y);

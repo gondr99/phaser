@@ -48,12 +48,12 @@ server.listen(50000, ()=>{
     console.log(`Server is running on 50000 port`);
 });
 
+//이 타이머는 이제 룸으로 이동해야 해.
 let sendPositionTimer:JobTimer = new JobTimer(50, ()=>{
     let pList = SessionManager.Instance.getPlayerList();
     //각 플레이어 정보 싱크
     SessionManager.Instance.broadcast("info_sync", {list:pList}, "none", false); //모두에게 브로드캐스팅
 });
-
 sendPositionTimer.startTimer();
 
 //모니터링 웹서버 부분
@@ -61,6 +61,8 @@ app.get("/info", (req:Request, res:Response)=>{
     let list = SessionManager.Instance.getPlayerList();
     let spawn = ServerMapManager.Instance.spawnPoints;
     res.json({list, spawn});
-
-    
 });  
+
+app.get("/error", (req:Request, res:Response)=>{
+    res.send(`<h1>ErrorPage</h1>`);
+});

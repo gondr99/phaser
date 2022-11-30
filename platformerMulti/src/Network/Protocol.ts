@@ -48,3 +48,17 @@ export interface ReviveInfo
     playerId:string;
     info:SessionInfo;
 }
+
+export interface UserInfo{
+    name:string;
+    playerId?:string;
+}
+
+//현재 방의 진행정보들
+export interface RoomInfo {
+    userList:UserInfo[],
+    roomName:string,
+    userCnt:number;
+    maxCnt:number;
+    isPlaying:boolean
+}

@@ -1,10 +1,20 @@
-import Phaser from "phaser";
+import Phaser, { LEFT } from "phaser";
+import { io } from "socket.io-client";
+import SocketManager from "../Core/SocketManager";
+import { GameOption } from "../GameOption";
 
 export default class PreloadAssetScene extends Phaser.Scene
 {
+    popupDiv: HTMLDivElement;
+    gameCanvas: HTMLCanvasElement;
+
     constructor()
     {
         super({key:"PreloadAsset"});
+        
+        const socket = io();
+        SocketManager.Instance = new SocketManager(socket); //소켓 매니저로 만들고
+        console.log("preload");
     }
 
     preload(): void 
@@ -29,10 +39,16 @@ export default class PreloadAssetScene extends Phaser.Scene
 
         //투사체 이미지 로드
         this.load.image("iceball", "assets/weapons/iceball_001.png");
+
+        //배경 이미지 로드
+        this.load.image('bg_sky', 'assets/background_0.png');
+        this.load.image('bg_mountain', 'assets/background02.png');
+        this.load.image('bg_spkie', 'assets/background03_spikes_light.png')
     }
 
     create(): void 
     {
-        this.scene.start("PlayGame");
+        this.scene.start("Lobby");
     }
+
 }

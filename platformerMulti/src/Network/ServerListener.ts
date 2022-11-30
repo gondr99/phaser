@@ -2,10 +2,16 @@ import {Socket} from 'socket.io';
 import ServerMapManager from '../Server/ServerMapManager';
 import Session from '../Server/Session';
 import SessionManager from '../Server/SessionManager';
-import { DeadInfo, Iceball, ProjectileHitInfo, ReviveInfo, SessionInfo } from './Protocol';
+import { DeadInfo, Iceball, ProjectileHitInfo, ReviveInfo, SessionInfo, UserInfo } from './Protocol';
 
 export const addServerSocketListener = (socket:Socket, session:Session) => {
     //이안에서 세션은 클로져 되어 보존됨.
+
+    socket.on("login_user", data => {
+        let userInfo = data as UserInfo;
+        session.setName(userInfo.name);
+        socket.emit("login_confirm", userInfo);
+    });
 
     socket.on("enter", data => {
         let posIndex:number = Math.floor( Math.random() * ServerMapManager.Instance.spawnPoints.length);

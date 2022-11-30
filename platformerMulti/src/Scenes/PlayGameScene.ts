@@ -2,7 +2,6 @@ import Phaser from "phaser";
 import MapManager from "../Core/MapManager";
 import Player from "../GameObjects/Player";
 import {GameOption} from "../GameOption";
-import {io, Socket} from "socket.io-client"
 import { ProjectileHitInfo, SessionInfo } from "../Network/Protocol";
 import SocketManager from "../Core/SocketManager";
 import ProjectilePool from "../GameObjects/Pools/ProjectilePool";
@@ -24,9 +23,8 @@ export default class PlayGameScene extends Phaser.Scene
 
     constructor()
     {
-        super({key:"PlayGame"});   
-        const socket = io();
-        SocketManager.Instance = new SocketManager(socket); //소켓 매니저로 만들고
+        super({key:"PlayGame"}); 
+        SocketManager.Instance.addGameProtocol(this); //생성자는 한번만 실행된다.
     }
 
     create():void 
@@ -34,7 +32,7 @@ export default class PlayGameScene extends Phaser.Scene
         MapManager.Instance = new MapManager(this, "level1");
         ProjectilePool.Instance = new ProjectilePool(this);
         
-        SocketManager.Instance.addProtocol(this);
+        
         
         this.playerName = "gondr";
         SocketManager.Instance.sendData("enter", {id:SocketManager.Instance.socket.id, name:this.playerName});

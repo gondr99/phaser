@@ -1,5 +1,6 @@
 import { Socket } from "socket.io-client";
-import { addClientProtocol } from "../Network/ClientListener";
+import { addGameSceneProtocol, addLobbySceneProtocol } from "../Network/ClientListener";
+import LobbyScene from "../Scenes/LobbyScene";
 import PlayGameScene from "../Scenes/PlayGameScene";
 
 export default class SocketManager
@@ -10,11 +11,22 @@ export default class SocketManager
     constructor(socket: Socket)
     {
         this.socket = socket;
+
+        this.socket.on("connect_error", (err)=>{
+            console.log(err);
+            alert("서버가 종료되었습니다. 점검페이지로 이동합니다. 잠시후 시도해주세요.");
+            location.href = "/error";
+        });
     }
 
-    addProtocol(scene:PlayGameScene): void 
+    addLobbyProtocol(scene:LobbyScene): void 
     {
-        addClientProtocol(this.socket, scene); //클라이언트 소켓 이벤트 더하기
+        addLobbySceneProtocol(this.socket, scene); //로비씬의 소켓을 더한다.
+    }
+
+    addGameProtocol(scene:PlayGameScene): void 
+    {
+        addGameSceneProtocol(this.socket, scene); //클라이언트 소켓 이벤트 더하기
     }
 
     sendData(protocol:string, data:object) : void 
