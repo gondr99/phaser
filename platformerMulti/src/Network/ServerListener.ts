@@ -1,6 +1,6 @@
 import {Socket} from 'socket.io';
 import ServerMapManager from '../Server/ServerMapManager';
-import Session from '../Server/Session';
+import Session, { SessionStatus } from '../Server/Session';
 import SessionManager from '../Server/SessionManager';
 import { DeadInfo, Iceball, ProjectileHitInfo, ReviveInfo, SessionInfo, UserInfo } from './Protocol';
 
@@ -10,6 +10,7 @@ export const addServerSocketListener = (socket:Socket, session:Session) => {
     socket.on("login_user", data => {
         let userInfo = data as UserInfo;
         session.setName(userInfo.name);
+        session.status = SessionStatus.LOBBY; //로비로 세션을 진입시킴
         socket.emit("login_confirm", userInfo);
     });
 

@@ -1,6 +1,15 @@
 import {Socket} from 'socket.io'
 import { Position, SessionInfo } from '../Network/Protocol';
 
+export enum SessionStatus
+{
+    CONNECTED = 1,
+    LOBBY = 2,
+    INROOM = 3,
+    READYINROOM = 4,
+    PLAYING = 5
+}
+
 export default class Session 
 {
     socket:Socket;
@@ -9,6 +18,8 @@ export default class Session
     id:string;
     flipX:boolean;
     isMoving:boolean;
+
+    status:SessionStatus = SessionStatus.CONNECTED;
 
     constructor(socket:Socket)
     {
